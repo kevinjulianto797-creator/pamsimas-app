@@ -514,7 +514,40 @@
       to { transform: translateX(0); opacity: 1; }
     }
 
-    /* RESPONSIVE */
+    .status-dot-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(0.85); opacity: 0.6; }
+      50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 8px currentColor; }
+    }
+
+    /* RESPONSIVE & SIDEBAR */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 98;
+    }
+    .sidebar-backdrop.active {
+      display: block;
+    }
+
+    .sidebar.desktop-collapsed {
+      transform: translateX(-260px);
+      margin-left: -260px;
+    }
+
     @media (max-width: 900px) {
       .sidebar {
         position: fixed;
@@ -548,6 +581,11 @@
     </div>
 
     <div class="nav-user">
+      <div id="badgeCloudStatus" class="badge badge-success" style="cursor: pointer; padding: 6px 12px; gap: 7px; text-transform: none; font-size: 12px;" onclick="pingBackendHealth()" title="Klik untuk periksa ulang status koneksi database">
+        <span class="status-dot-pulse" id="dotCloudStatus" style="background: var(--primary); color: var(--primary);"></span>
+        <span id="textCloudStatus">Database Terhubung</span>
+      </div>
+
       <div class="nav-user-pill">
         <div class="avatar" id="navAvatar">A</div>
         <div class="nav-user-info">
@@ -560,6 +598,9 @@
       </button>
     </div>
   </nav>
+
+  <!-- BACKDROP MOBILE UNTUK DRAWER SIDEBAR -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
   <div class="app-layout">
     <!-- SIDEBAR -->
@@ -621,7 +662,12 @@
             </div>
             <div class="form-group">
               <label>Kata Sandi</label>
-              <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+              <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 42px;">
+                <button type="button" onclick="togglePasswordVisibility('loginPassword', this)" style="position: absolute; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px;" title="Lihat / Sembunyikan Sandi">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
             </div>
             <button type="submit" class="btn btn-primary" id="btnLogin" style="width: 100%; margin-top: 10px; padding: 12px;">
               <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk ke Sistem
@@ -1301,7 +1347,7 @@
   <div class="modal-overlay" id="modalPelanggan">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title"><i class="fa-solid fa-user-plus"></i> Formulir Pelanggan</div>
+        <div class="modal-title" id="modalPelangganTitle"><i class="fa-solid fa-user-plus"></i> Formulir Pelanggan</div>
         <button class="modal-close" onclick="closeModal('modalPelanggan')">&times;</button>
       </div>
       <form onsubmit="event.preventDefault(); submitSimpanPelanggan();">
@@ -1344,12 +1390,66 @@
         </div>
         <div class="form-group">
           <label>Kata Sandi Akun</label>
-          <input type="text" class="form-control" id="formPelangganPassword" placeholder="Default 6 digit no WA">
+          <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" class="form-control" id="formPelangganPassword" placeholder="Default 6 digit no WA" style="padding-right: 42px;">
+            <button type="button" onclick="togglePasswordVisibility('formPelangganPassword', this)" style="position: absolute; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px;" title="Lihat / Sembunyikan Sandi">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary" id="btnSubmitPelanggan" style="width: 100%; margin-top: 10px;">
           <i class="fa-solid fa-save"></i> Simpan Data Pelanggan
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL KARTU DIGITAL & QR CODE WARGA ================= -->
+  <div class="modal-overlay" id="modalKartuPelanggan">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-id-card"></i> Kartu Pelanggan Digital</div>
+        <button class="modal-close" onclick="closeModal('modalKartuPelanggan')">&times;</button>
+      </div>
+      <div id="kartuDigitalArea" class="glass-panel" style="padding: 20px; text-align: center; border: 2px dashed var(--border-accent); background: #0d121c;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--primary);" id="kartuInstansi">PAMSIMAS</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">KARTU KONTROL PEMANFAAT AIR BERSIH</div>
+        
+        <div style="background: #fff; padding: 10px; border-radius: 12px; display: inline-block; margin-bottom: 12px;">
+          <img id="kartuQrImg" src="" alt="QR Pelanggan" style="width: 140px; height: 140px; display: block;">
+        </div>
+
+        <div style="font-size: 16px; font-weight: 800; color: #fff;" id="kartuNama">-</div>
+        <div style="font-size: 13px; font-weight: 700; color: var(--primary); margin: 2px 0;" id="kartuId">-</div>
+        <div style="font-size: 12px; color: var(--text-muted);" id="kartuAlamat">-</div>
+        <div style="font-size: 11px; color: #60a5fa; margin-top: 4px;" id="kartuGolongan">Golongan: R-1</div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <button type="button" class="btn btn-primary" onclick="unduhKartuDigitalGambar()" style="flex: 1;">
+          <i class="fa-solid fa-download"></i> Unduh Kartu
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="window.print()" style="flex: 1;">
+          <i class="fa-solid fa-print"></i> Cetak
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL KONFIRMASI HAPUS PELANGGAN ================= -->
+  <div class="modal-overlay" id="modalHapusPelanggan">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+      <div style="width: 55px; height: 55px; background: rgba(239, 68, 68, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 26px; color: var(--danger);"></i>
+      </div>
+      <h3 style="font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 6px;">Hapus Data Pelanggan?</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;" id="textKonfirmasiHapus">-</p>
+      <input type="hidden" id="hapusTargetIdPelanggan">
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalHapusPelanggan')" style="flex: 1;">Batal</button>
+        <button type="button" class="btn btn-danger" id="btnEksekusiHapus" onclick="eksekusiHapusPelanggan()" style="flex: 1;">
+          <i class="fa-solid fa-trash"></i> Ya, Hapus
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1384,7 +1484,12 @@
         </div>
         <div class="form-group">
           <label>Kata Sandi</label>
-          <input type="password" class="form-control" id="petugasPassword" required>
+          <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" class="form-control" id="petugasPassword" required style="padding-right: 42px;">
+            <button type="button" onclick="togglePasswordVisibility('petugasPassword', this)" style="position: absolute; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px;" title="Lihat / Sembunyikan Sandi">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
           <i class="fa-solid fa-save"></i> Daftarkan Pengurus
@@ -1580,6 +1685,44 @@
     // URL Google Apps Script Anda langsung saya pasang di sini:
     const BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbzVex78pnEKM4zu8KvFr3_ImM7GSQ1XqKAT3iGHlg0_jpR9EtTgpgtipXuQEHhyW65V/exec";
 
+    let isCloudOnline = false;
+
+    function setCloudStatus(online, message) {
+      isCloudOnline = online;
+      const badge = document.getElementById("badgeCloudStatus");
+      const dot = document.getElementById("dotCloudStatus");
+      const text = document.getElementById("textCloudStatus");
+      if (!badge || !dot || !text) return;
+
+      if (online) {
+        badge.className = "badge badge-success";
+        dot.style.background = "var(--primary)";
+        dot.style.color = "var(--primary)";
+        text.innerText = message || "Database Terhubung";
+      } else {
+        badge.className = "badge badge-warning";
+        dot.style.background = "var(--warning)";
+        dot.style.color = "var(--warning)";
+        text.innerText = message || "Mode Cadangan";
+      }
+    }
+
+    function pingBackendHealth() {
+      showToast("Memeriksa koneksi database...", "info");
+      callBackend("getTarifSettings", [], function(res) {
+        if (res && res.success) {
+          setCloudStatus(true, "Database Terhubung");
+          showToast("Koneksi Google Spreadsheet aktif & stabil!", "success");
+        } else {
+          setCloudStatus(false, "Respon Terbatas");
+          showToast("Koneksi lambat atau database belum merespon.", "warning");
+        }
+      }, function() {
+        setCloudStatus(false, "Mode Cadangan");
+        showToast("Terputus dari Google Apps Script. Beralih ke data cadangan.", "warning");
+      });
+    }
+
     /**
      * Pemanggil API Universal (Dual-Mode):
      * - Jika dibuka di Google Apps Script -> Memakai google.script.run
@@ -1589,8 +1732,12 @@
       // 1. Jika di Google Apps Script
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
-          .withSuccessHandler(function(res) { if (onSuccess) onSuccess(res); })
+          .withSuccessHandler(function(res) { 
+            setCloudStatus(true, "GAS Terhubung");
+            if (onSuccess) onSuccess(res); 
+          })
           .withFailureHandler(function(err) {
+            setCloudStatus(false, "GAS Error");
             showToast("Server Error: " + (err.message || err), "danger");
             if (onFallbackDemo) onFallbackDemo();
           })[functionName].apply(google.script.run, paramsArray);
@@ -1605,15 +1752,20 @@
           body: JSON.stringify({ action: functionName, params: paramsArray })
         })
         .then(function(res) { return res.json(); })
-        .then(function(data) { if (onSuccess) onSuccess(data); })
+        .then(function(data) { 
+          setCloudStatus(true, "Database Terhubung");
+          if (onSuccess) onSuccess(data); 
+        })
         .catch(function(err) {
           console.warn("Koneksi API Vercel bermasalah, beralih ke cadangan.", err);
+          setCloudStatus(false, "Mode Cadangan");
           if (onFallbackDemo) onFallbackDemo();
           else showToast("Gagal menghubungi server Google Apps Script!", "danger");
         });
         return;
       }
 
+      setCloudStatus(false, "Mode Cadangan");
       if (onFallbackDemo) onFallbackDemo();
     }
 
@@ -1678,8 +1830,50 @@
       if (m) m.style.display = "none";
     }
 
+    /* CONTROLLER HAMBURGER SIDEBAR (DESKTOP & MOBILE) */
     function toggleSidebar() {
-      document.getElementById("appSidebar").classList.toggle("open");
+      const sidebar = document.getElementById("appSidebar");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      if (!sidebar) return;
+
+      if (window.innerWidth <= 900) {
+        const isOpen = sidebar.classList.toggle("open");
+        if (backdrop) {
+          if (isOpen) backdrop.classList.add("active");
+          else backdrop.classList.remove("active");
+        }
+      } else {
+        sidebar.classList.toggle("desktop-collapsed");
+      }
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById("appSidebar");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      if (sidebar) sidebar.classList.remove("open");
+      if (backdrop) backdrop.classList.remove("active");
+    }
+
+    /* FUNGSI TOGGLE LIHAT/SEMBUNYIKAN KATA SANDI (MATA) */
+    function togglePasswordVisibility(inputId, btnEl) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const icon = btnEl.querySelector("i");
+      if (input.type === "password") {
+        input.type = "text";
+        if (icon) {
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+          icon.style.color = "var(--primary)";
+        }
+      } else {
+        input.type = "password";
+        if (icon) {
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+          icon.style.color = "var(--text-muted)";
+        }
+      }
     }
 
     function handleLogin() {
@@ -1868,7 +2062,20 @@
           '<td>' + (parseFloat(p.meterAwal) || 0) + ' m³</td>' +
           '<td><span class="badge badge-success">' + p.status + '</span></td>' +
           '<td>' +
-            '<button class="btn btn-secondary btn-sm" onclick="kirimAkunWhatsApp(\'' + p.idPelanggan + '\')"><i class="fa-brands fa-whatsapp"></i> Akun</button>' +
+            '<div style="display: flex; gap: 6px; flex-wrap: wrap;">' +
+              '<button class="btn btn-secondary btn-sm" onclick="bukaKartuPelanggan(\'' + p.idPelanggan + '\')" title="Lihat Kartu & QR Code">' +
+                '<i class="fa-solid fa-qrcode"></i> Kartu' +
+              '</button>' +
+              '<button class="btn btn-secondary btn-sm" onclick="openModalEditPelanggan(\'' + p.idPelanggan + '\')" title="Edit Data Warga">' +
+                '<i class="fa-solid fa-pen-to-square"></i> Edit' +
+              '</button>' +
+              '<button class="btn btn-primary btn-sm" onclick="kirimAkunWhatsApp(\'' + p.idPelanggan + '\')" title="Kirim Kredensial via WA">' +
+                '<i class="fa-brands fa-whatsapp"></i> WA' +
+              '</button>' +
+              '<button class="btn btn-danger btn-sm" onclick="bukaModalHapusPelanggan(\'' + p.idPelanggan + '\', \'' + p.nama.replace(/'/g, "\\'") + '\')" title="Hapus Pelanggan">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
+            '</div>' +
           '</td>';
         tbody.appendChild(tr);
       });
@@ -1877,6 +2084,7 @@
     }
 
     function openModalPelanggan() {
+      document.getElementById("modalPelangganTitle").innerHTML = '<i class="fa-solid fa-user-plus"></i> Tambah Pelanggan Baru';
       document.getElementById("formPelangganId").value = "";
       document.getElementById("formPelangganNama").value = "";
       document.getElementById("formPelangganNik").value = "";
@@ -1888,8 +2096,87 @@
       openModal("modalPelanggan");
     }
 
+    function openModalEditPelanggan(idPelanggan) {
+      const p = rawPelangganList.find(x => x.idPelanggan === idPelanggan);
+      if (!p) return;
+      document.getElementById("modalPelangganTitle").innerHTML = '<i class="fa-solid fa-user-pen"></i> Edit Data Pelanggan';
+      document.getElementById("formPelangganId").value = p.idPelanggan;
+      document.getElementById("formPelangganNama").value = p.nama;
+      document.getElementById("formPelangganNik").value = p.nik && p.nik !== "-" ? p.nik : "";
+      document.getElementById("formPelangganAlamat").value = p.alamat;
+      document.getElementById("formPelangganRtRw").value = p.rtRw || "RT 01 / RW 01";
+      document.getElementById("formPelangganNoHp").value = p.noHp;
+      document.getElementById("formPelangganGolongan").value = p.golongan;
+      document.getElementById("formPelangganMeterAwal").value = p.meterAwal || "0";
+      document.getElementById("formPelangganPassword").value = (p.password && !p.password.includes("•")) ? p.password : "";
+      openModal("modalPelanggan");
+    }
+
+    function bukaKartuPelanggan(idPelanggan) {
+      const p = rawPelangganList.find(x => x.idPelanggan === idPelanggan);
+      if (!p) return;
+      document.getElementById("kartuInstansi").innerText = appSettings.nama_instansi || "PAMSIMAS";
+      document.getElementById("kartuNama").innerText = p.nama;
+      document.getElementById("kartuId").innerText = p.idPelanggan;
+      document.getElementById("kartuAlamat").innerText = p.alamat + " (" + p.rtRw + ")";
+      document.getElementById("kartuGolongan").innerText = "Golongan: " + p.golongan + " | WA: " + p.noHp;
+      
+      const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + encodeURIComponent(p.idPelanggan);
+      document.getElementById("kartuQrImg").src = qrUrl;
+      openModal("modalKartuPelanggan");
+    }
+
+    function unduhKartuDigitalGambar() {
+      const area = document.getElementById("kartuDigitalArea");
+      showToast("Sedang membuat gambar kartu...", "info");
+      html2canvas(area, { backgroundColor: "#0d121c", scale: 2 }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "Kartu-" + document.getElementById("kartuId").innerText + ".png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        showToast("Kartu digital berhasil diunduh!", "success");
+      }).catch(() => {
+        showToast("Gagal mengunduh kartu.", "danger");
+      });
+    }
+
+    function bukaModalHapusPelanggan(idPelanggan, nama) {
+      document.getElementById("hapusTargetIdPelanggan").value = idPelanggan;
+      document.getElementById("textKonfirmasiHapus").innerText = "Apakah Anda yakin ingin menghapus pelanggan " + nama + " (" + idPelanggan + ") beserta akun loginnya?";
+      openModal("modalHapusPelanggan");
+    }
+
+    function eksekusiHapusPelanggan() {
+      const idPel = document.getElementById("hapusTargetIdPelanggan").value;
+      if (!idPel) return;
+      const btn = document.getElementById("btnEksekusiHapus");
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menghapus...';
+      btn.disabled = true;
+
+      callBackend("hapusPermanenPelanggan", [idPel], function(res) {
+        btn.innerHTML = '<i class="fa-solid fa-trash"></i> Ya, Hapus';
+        btn.disabled = false;
+        closeModal("modalHapusPelanggan");
+        if (res && res.success) {
+          showToast(res.message, "success");
+          loadDataPelanggan();
+        } else {
+          showToast((res && res.message) ? res.message : "Gagal menghapus!", "danger");
+        }
+      }, function() {
+        btn.innerHTML = '<i class="fa-solid fa-trash"></i> Ya, Hapus';
+        btn.disabled = false;
+        closeModal("modalHapusPelanggan");
+        rawPelangganList = rawPelangganList.filter(x => x.idPelanggan !== idPel);
+        renderTablePelanggan();
+        showToast("Pelanggan " + idPel + " berhasil dihapus (Mode Cadangan)", "success");
+      });
+    }
+
     function submitSimpanPelanggan() {
+      const formId = document.getElementById("formPelangganId").value;
       const data = {
+        idPelanggan: formId,
         nama: document.getElementById("formPelangganNama").value.trim(),
         nik: document.getElementById("formPelangganNik").value.trim(),
         alamat: document.getElementById("formPelangganAlamat").value.trim(),
@@ -1904,7 +2191,9 @@
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
       btn.disabled = true;
 
-      callBackend("simpanPelanggan", [data], function(res) {
+      const backendAction = formId ? "updatePelanggan" : "simpanPelanggan";
+
+      callBackend(backendAction, [data], function(res) {
         btn.innerHTML = '<i class="fa-solid fa-save"></i> Simpan Data Pelanggan';
         btn.disabled = false;
         if (res && res.success) {
@@ -1917,20 +2206,35 @@
       }, function() {
         btn.innerHTML = '<i class="fa-solid fa-save"></i> Simpan Data Pelanggan';
         btn.disabled = false;
-        const newId = "PLG-000" + (rawPelangganList.length + 1);
-        rawPelangganList.push({
-          idPelanggan: newId,
-          nama: data.nama,
-          nik: data.nik,
-          alamat: data.alamat,
-          rtRw: data.rtRw,
-          noHp: data.noHp,
-          golongan: data.golongan,
-          meterAwal: data.meterAwal,
-          status: "Aktif",
-          password: data.password || "123456"
-        });
-        showToast("Pelanggan " + newId + " berhasil ditambahkan (Demo)", "success");
+        if (formId) {
+          const idx = rawPelangganList.findIndex(x => x.idPelanggan === formId);
+          if (idx !== -1) {
+            rawPelangganList[idx].nama = data.nama;
+            rawPelangganList[idx].nik = data.nik;
+            rawPelangganList[idx].alamat = data.alamat;
+            rawPelangganList[idx].rtRw = data.rtRw;
+            rawPelangganList[idx].noHp = data.noHp;
+            rawPelangganList[idx].golongan = data.golongan;
+            rawPelangganList[idx].meterAwal = data.meterAwal;
+            if (data.password) rawPelangganList[idx].password = data.password;
+          }
+          showToast("Pelanggan " + formId + " berhasil diperbarui (Demo)", "success");
+        } else {
+          const newId = "PLG-000" + (rawPelangganList.length + 1);
+          rawPelangganList.push({
+            idPelanggan: newId,
+            nama: data.nama,
+            nik: data.nik,
+            alamat: data.alamat,
+            rtRw: data.rtRw,
+            noHp: data.noHp,
+            golongan: data.golongan,
+            meterAwal: data.meterAwal,
+            status: "Aktif",
+            password: data.password || "123456"
+          });
+          showToast("Pelanggan " + newId + " berhasil ditambahkan (Demo)", "success");
+        }
         closeModal("modalPelanggan");
         renderTablePelanggan();
       });
@@ -2904,6 +3208,7 @@
     // Inisialisasi awal saat window dimuat
     window.onload = function() {
       loadPengaturanAplikasi();
+      setTimeout(pingBackendHealth, 1000);
     };
   </script>
 </body>
