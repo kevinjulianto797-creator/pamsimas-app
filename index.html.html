@@ -1294,7 +1294,17 @@
           <span id="strukGrandTotal">Rp 0</span>
         </div>
 
-        <div class="receipt-row">
+        <!-- RINCIAN PEMBAYARAN: DIBAYAR & KEMBALIAN -->
+        <div class="receipt-row" id="rowStrukUangDibayar">
+          <span class="label">Jumlah Dibayar</span>
+          <span class="val" id="strukUangDibayar">Rp 0</span>
+        </div>
+        <div class="receipt-row" id="rowStrukKembalian">
+          <span class="label">Uang Kembalian</span>
+          <span class="val" id="strukKembalian" style="color: #60a5fa;">Rp 0</span>
+        </div>
+
+        <div class="receipt-row" style="margin-top: 4px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08);">
           <span class="label">Metode Pembayaran</span>
           <span class="val" id="strukMetodeBayar">Tunai</span>
         </div>
@@ -1802,6 +1812,22 @@
     function formatRupiah(num) {
       const n = parseFloat(num) || 0;
       return "Rp " + n.toLocaleString("id-ID");
+    }
+
+    function formatNamaPeriode(perStr) {
+      if (!perStr) return "-";
+      const parts = perStr.split("/");
+      if (parts.length === 2) {
+        const monthNames = [
+          "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+          "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+        const mIdx = parseInt(parts[0], 10) - 1;
+        if (mIdx >= 0 && mIdx < 12) {
+          return monthNames[mIdx] + "/ " + parts[1];
+        }
+      }
+      return perStr;
     }
 
     function formatInputRibuan(input) {
@@ -2523,7 +2549,7 @@
       document.getElementById("strukIdTagihan").innerText = t.idTagihan;
       document.getElementById("strukIdPelanggan").innerText = t.idPelanggan;
       document.getElementById("strukNamaWarga").innerText = t.namaPelanggan;
-      document.getElementById("strukPeriode").innerText = t.periode;
+      document.getElementById("strukPeriode").innerText = formatNamaPeriode(t.periode);
 
       document.getElementById("strukStandMeter").innerText = t.meterLalu + " → " + t.meterKini + " m³";
       document.getElementById("strukPakaiM3").innerText = t.pemakaianM3 + " m³";
@@ -2533,7 +2559,7 @@
 
       document.getElementById("strukBeban").innerText = formatRupiah(t.biayaBeban);
       document.getElementById("strukDenda").innerText = formatRupiah(t.denda);
-      document.getElementById("rowStrukDenda").style.display = (t.denda > 0) ? "flex" : "none";
+      document.getElementById("rowKasirDenda").style.display = (t.denda > 0) ? "flex" : "none";
 
       const admin = t.biayaAdminTerpasang || 0;
       document.getElementById("strukAdmin").innerText = formatRupiah(admin);
@@ -2541,6 +2567,21 @@
 
       const finalGrand = t.calculatedGrandTotal || t.totalTagihan;
       document.getElementById("strukGrandTotal").innerText = formatRupiah(finalGrand);
+
+      // KALKULASI DIBAYAR DAN KEMBALIAN DI STRUK
+      let dibayar = finalGrand;
+      let kembalian = 0;
+      if (activeMetodeBayar === "Tunai") {
+        const rawIn = (document.getElementById("kasirUangDiterima").value || "").replace(/\./g, "");
+        dibayar = parseFloat(rawIn) || finalGrand;
+        kembalian = Math.max(0, dibayar - finalGrand);
+      }
+      t.uangDibayarStruk = dibayar;
+      t.uangKembalianStruk = kembalian;
+
+      document.getElementById("strukUangDibayar").innerText = formatRupiah(dibayar);
+      document.getElementById("strukKembalian").innerText = formatRupiah(kembalian);
+
       document.getElementById("strukMetodeBayar").innerText = activeMetodeBayar;
       document.getElementById("strukPetugasKasir").innerText = currentUser ? currentUser.nama : "Kasir";
 
@@ -2645,14 +2686,19 @@
       if (!currentActiveTagihan) return;
       const t = currentActiveTagihan;
       const finalGrand = t.calculatedGrandTotal || t.totalTagihan;
+      const dibayar = t.uangDibayarStruk || finalGrand;
+      const kembalian = t.uangKembalianStruk || 0;
+
       const pesan = "*BUKTI KUITANSI TAGIHAN AIR PAMSIMAS*\n\n" +
         "• No. Tagihan: *" + t.idTagihan + "*\n" +
         "• Pelanggan: *" + t.namaPelanggan + " (" + t.idPelanggan + ")*\n" +
-        "• Periode: *" + t.periode + "*\n" +
+        "• Periode Rekening: *" + formatNamaPeriode(t.periode) + "*\n" +
         "• Pemakaian: *" + t.pemakaianM3 + " m³*\n" +
         "• Biaya Air: *" + formatRupiah(t.biayaAir) + "*\n" +
-        "• Beban: *" + formatRupiah(t.biayaBeban) + "*\n" +
-        "• Total Bayar: *" + formatRupiah(finalGrand) + "*\n" +
+        "• Beban Abonemen: *" + formatRupiah(t.biayaBeban) + "*\n" +
+        "• Total Tagihan: *" + formatRupiah(finalGrand) + "*\n" +
+        "• Jumlah Dibayar: *" + formatRupiah(dibayar) + "*\n" +
+        "• Uang Kembalian: *" + formatRupiah(kembalian) + "*\n" +
         "• Status: *" + (t.status === "Lunas" ? "LUNAS (SAH)" : "MENUNGGU PEMBAYARAN") + "*\n" +
         "• Metode: *" + activeMetodeBayar + "*\n\n" +
         "Terima kasih atas partisipasi Anda dalam menjaga kelestarian air bersih pedesaan.";
@@ -3205,9 +3251,312 @@
       window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
     }
 
+    /* =========================================================================
+     * 📱 PWA (PROGRESSIVE WEB APP) - OPSIONAL PASANG KE LAYAR UTAMA
+     * ========================================================================= */
+    let deferredPwaPrompt = null;
+
+    function initPwaCapabilities() {
+      // 1. Daftarkan Web App Manifest secara dinamis
+      try {
+        const manifestObj = {
+          name: "PAMSIMAS - Sistem Air Bersih",
+          short_name: "PAMSIMAS",
+          description: "Sistem Informasi & Billing Pembayaran Air Bersih Pedesaan",
+          start_url: window.location.href,
+          display: "standalone",
+          background_color: "#0b0f19",
+          theme_color: "#0b0f19",
+          icons: [
+            {
+              src: "https://placehold.co/192x192/0b0f19/00ffaa?text=PAMSIMAS",
+              sizes: "192x192",
+              type: "image/png"
+            },
+            {
+              src: "https://placehold.co/512x512/0b0f19/00ffaa?text=PAMSIMAS",
+              sizes: "512x512",
+              type: "image/png"
+            }
+          ]
+        };
+        const manifestString = JSON.stringify(manifestObj);
+        const manifestBlob = new Blob([manifestString], { type: 'application/manifest+json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestUrl;
+        document.head.appendChild(link);
+      } catch (err) {
+        console.warn("PWA manifest error:", err);
+      }
+
+      // 2. Daftarkan In-Memory Service Worker
+      if ('serviceWorker' in navigator) {
+        const swScript = `
+          const CACHE_NAME = 'pamsimas-sw-v1';
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(
+              fetch(e.request).catch(() => caches.match(e.request))
+            );
+          });
+        `;
+        try {
+          const swBlob = new Blob([swScript], { type: 'application/javascript' });
+          const swUrl = URL.createObjectURL(swBlob);
+          navigator.serviceWorker.register(swUrl).catch(() => {});
+        } catch (e) {}
+      }
+
+      // 3. Tangkap event prompt instalasi
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPwaPrompt = e;
+        const banner = document.getElementById('pwaInstallBanner');
+        const navBtn = document.getElementById('btnNavInstallPwa');
+        if (banner) banner.style.display = 'flex';
+        if (navBtn) navBtn.style.display = 'inline-flex';
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredPwaPrompt = null;
+        dismissPwaBanner();
+        showToast("Aplikasi PAMSIMAS berhasil terpasang di HP Anda!", "success");
+      });
+    }
+
+    function triggerPwaInstall() {
+      if (!deferredPwaPrompt) {
+        showToast("Untuk memasang: buka menu browser (titik tiga) > pilih 'Tambahkan ke Layar Utama'", "info");
+        return;
+      }
+      deferredPwaPrompt.prompt();
+      deferredPwaPrompt.userChoice.then((choice) => {
+        if (choice.outcome === 'accepted') {
+          showToast("Memasang aplikasi...", "success");
+        }
+        deferredPwaPrompt = null;
+        dismissPwaBanner();
+      });
+    }
+
+    function dismissPwaBanner() {
+      const banner = document.getElementById('pwaInstallBanner');
+      if (banner) banner.style.display = 'none';
+    }
+
+    /* =========================================================================
+     * 🖨️ WEB BLUETOOTH THERMAL PRINTER & ESC/POS ENGINE (58MM & 80MM)
+     * ========================================================================= */
+    let btDevice = null;
+    let btServer = null;
+    let btPrintCharacteristic = null;
+
+    // UUID Layanan Standar Printer Thermal Bluetooth Populer (POS-58, EPPOS, dsb)
+    const THERMAL_PRINTER_SERVICES = [
+      "000018f0-0000-1000-8000-00805f9b34fb", // Standar printer POS
+      "49535343-fe7d-41aa-8d19-005540d20b60", // ISSC serial service
+      "e7810a71-73ae-499d-8c15-faa9aef0c3f2", // Common thermal
+      "0000ff00-0000-1000-8000-00805f9b34fb"  // Custom generic
+    ];
+
+    async function connectBluetoothThermalPrinter() {
+      if (!navigator.bluetooth) {
+        showToast("Browser tidak mendukung Web Bluetooth. Gunakan Chrome di Android/Laptop atau gunakan opsi Cetak Browser.", "warning");
+        return;
+      }
+
+      const btn = document.getElementById("btnKoneksiBt");
+      const txt = document.getElementById("textBtPrinterStatus");
+      const icon = document.getElementById("iconBtStatus");
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mencari...';
+
+      try {
+        btDevice = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: THERMAL_PRINTER_SERVICES
+        });
+
+        btDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
+
+        txt.innerText = "Menghubungkan ke " + btDevice.name + "...";
+        btServer = await btDevice.gatt.connect();
+
+        // Cari karakteristik printer yang mendukung Write
+        let foundChar = null;
+        const services = await btServer.getPrimaryServices();
+        for (const s of services) {
+          try {
+            const chars = await s.getCharacteristics();
+            for (const c of chars) {
+              if (c.properties.write || c.properties.writeWithoutResponse) {
+                foundChar = c;
+                break;
+              }
+            }
+            if (foundChar) break;
+          } catch (e) {}
+        }
+
+        if (!foundChar) {
+          throw new Error("Layanan cetak printer tidak ditemukan pada perangkat Bluetooth ini.");
+        }
+
+        btPrintCharacteristic = foundChar;
+
+        txt.innerText = "Terhubung: " + btDevice.name;
+        txt.style.color = "var(--primary)";
+        icon.style.color = "var(--primary)";
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Terhubung';
+        btn.className = "btn btn-primary btn-sm";
+        showToast("Printer Bluetooth " + btDevice.name + " berhasil terhubung!", "success");
+      } catch (err) {
+        console.warn("Koneksi Bluetooth gagal:", err);
+        txt.innerText = "Gagal terhubung";
+        txt.style.color = "var(--danger)";
+        btn.innerHTML = '<i class="fa-solid fa-link"></i> Sambungkan';
+        btn.className = "btn btn-secondary btn-sm";
+        if (err.name !== 'NotFoundError') {
+          showToast("Koneksi Bluetooth: " + (err.message || err), "danger");
+        }
+      }
+    }
+
+    function onBluetoothDisconnected() {
+      const txt = document.getElementById("textBtPrinterStatus");
+      const icon = document.getElementById("iconBtStatus");
+      const btn = document.getElementById("btnKoneksiBt");
+      if (txt) {
+        txt.innerText = "Printer Bluetooth Terputus";
+        txt.style.color = "var(--text-muted)";
+      }
+      if (icon) icon.style.color = "var(--text-muted)";
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-link"></i> Sambungkan';
+        btn.className = "btn btn-secondary btn-sm";
+      }
+      btPrintCharacteristic = null;
+      btServer = null;
+    }
+
+    // Generator Perintah ESC/POS untuk Struk 58mm (Lebar 32 Karakter)
+    function buildEscPosData(tagihan) {
+      const ESC = '\x1B';
+      const GS = '\x1D';
+
+      let cmds = '';
+      cmds += ESC + '@'; // Inisialisasi printer
+      cmds += ESC + 'a' + '\x01'; // Text align center
+
+      // Header Instansi
+      cmds += ESC + '!' + '\x38'; // Double height + double width + bold
+      cmds += (appSettings.nama_instansi || "PAMSIMAS") + '\n';
+      cmds += ESC + '!' + '\x00'; // Normal font
+      cmds += (appSettings.sub_judul_instansi || "Pengelola Air Bersih") + '\n';
+      cmds += (appSettings.alamat_instansi || "") + '\n';
+      cmds += '--------------------------------\n'; // 32 Karakter 58mm
+
+      cmds += ESC + 'a' + '\x00'; // Text align left
+      const padRow = (lbl, val) => {
+        const totalLen = 32;
+        let l = (lbl || "").substring(0, 14);
+        let v = (val || "").substring(0, 18);
+        let spaces = totalLen - (l.length + v.length);
+        if (spaces < 1) spaces = 1;
+        return l + ' '.repeat(spaces) + v + '\n';
+      };
+
+      const now = new Date();
+      const tglCetak = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
+      cmds += padRow('Tgl Bayar:', tglCetak);
+      cmds += padRow('No Tagihan:', tagihan.idTagihan);
+      cmds += padRow('Pelanggan:', tagihan.idPelanggan);
+      cmds += padRow('Nama Warga:', tagihan.namaPelanggan);
+      cmds += padRow('Periode:', formatNamaPeriode(tagihan.periode));
+      cmds += '--------------------------------\n';
+
+      cmds += padRow('Meter Lalu:', (tagihan.meterLalu || 0) + ' m3');
+      cmds += padRow('Meter Kini:', (tagihan.meterKini || 0) + ' m3');
+      cmds += padRow('Pemakaian:', (tagihan.pemakaianM3 || 0) + ' m3');
+      cmds += padRow('Biaya Air:', formatRupiah(tagihan.biayaAir));
+      cmds += padRow('Beban:', formatRupiah(tagihan.biayaBeban));
+      if (tagihan.denda > 0) {
+        cmds += padRow('Denda:', formatRupiah(tagihan.denda));
+      }
+      if (tagihan.biayaAdminTerpasang > 0) {
+        cmds += padRow('Biaya Admin:', formatRupiah(tagihan.biayaAdminTerpasang));
+      }
+      cmds += '--------------------------------\n';
+
+      // Total Tagihan Tebal & Besar
+      cmds += ESC + '!' + '\x18'; // Double height bold
+      const grandTotal = tagihan.calculatedGrandTotal || tagihan.totalTagihan;
+      cmds += padRow('TOTAL:', formatRupiah(grandTotal));
+      cmds += ESC + '!' + '\x00'; // Reset ke normal
+
+      const dibayar = tagihan.uangDibayarStruk || grandTotal;
+      const kembalian = tagihan.uangKembalianStruk || 0;
+      cmds += padRow('Dibayar:', formatRupiah(dibayar));
+      cmds += padRow('Kembalian:', formatRupiah(kembalian));
+      cmds += padRow('Metode:', activeMetodeBayar);
+      cmds += padRow('Kasir:', currentUser ? currentUser.nama : "Kasir");
+
+      cmds += '--------------------------------\n';
+      cmds += ESC + 'a' + '\x01'; // Center
+      cmds += ESC + '!' + '\x08'; // Bold
+      cmds += (tagihan.status === 'Lunas' ? '*** LUNAS (SAH) ***' : '*** BELUM LUNAS ***') + '\n';
+      cmds += ESC + '!' + '\x00';
+      cmds += 'Simpan bukti ini sebagai tanda\npembayaran sah air PAMSIMAS\n';
+      cmds += '\n\n\n'; // Feed paper
+      cmds += GS + 'V' + '\x41' + '\x00'; // Cut paper (jika didukung)
+
+      // Ubah string ke Uint8Array (Windows-1252 / ISO-8859-1)
+      const buffer = new Uint8Array(cmds.length);
+      for (let i = 0; i < cmds.length; i++) {
+        buffer[i] = cmds.charCodeAt(i) & 0xFF;
+      }
+      return buffer;
+    }
+
+    async function cetakStrukBluetoothThermal() {
+      if (!currentActiveTagihan) return;
+
+      if (!btPrintCharacteristic) {
+        showToast("Printer Bluetooth belum terhubung! Silakan klik 'Sambungkan' terlebih dahulu.", "warning");
+        await connectBluetoothThermalPrinter();
+        if (!btPrintCharacteristic) return;
+      }
+
+      showToast("Mengirim data ke printer thermal...", "info");
+      try {
+        const rawBytes = buildEscPosData(currentActiveTagihan);
+
+        // Kirim data dalam potongan chunk 100 bytes (MTU BLE compatibility)
+        const CHUNK_SIZE = 100;
+        for (let i = 0; i < rawBytes.length; i += CHUNK_SIZE) {
+          const chunk = rawBytes.slice(i, i + CHUNK_SIZE);
+          if (btPrintCharacteristic.writeValueWithoutResponse) {
+            await btPrintCharacteristic.writeValueWithoutResponse(chunk);
+          } else {
+            await btPrintCharacteristic.writeValue(chunk);
+          }
+          // Jeda microsecond agar buffer printer tidak meluap
+          await new Promise(r => setTimeout(r, 20));
+        }
+
+        showToast("Struk thermal berhasil dicetak!", "success");
+      } catch (err) {
+        console.error("Gagal cetak thermal:", err);
+        showToast("Gagal mencetak struk: " + (err.message || err), "danger");
+      }
+    }
+
     // Inisialisasi awal saat window dimuat
     window.onload = function() {
       loadPengaturanAplikasi();
+      initPwaCapabilities();
       setTimeout(pingBackendHealth, 1000);
     };
   </script>
