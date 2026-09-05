@@ -84,8 +84,8 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 10px 18px;
-      font-size: 14px;
+      padding: 10px 16px;
+      font-size: 13px;
       font-weight: 600;
       border-radius: var(--radius-sm);
       border: none;
@@ -93,6 +93,8 @@
       transition: all 0.2s ease;
       text-decoration: none;
       color: #fff;
+      white-space: nowrap;
+      touch-action: manipulation;
     }
     .btn:active {
       transform: scale(0.97);
@@ -126,7 +128,7 @@
       color: #0b0f19;
     }
     .btn-sm {
-      padding: 6px 12px;
+      padding: 7px 12px;
       font-size: 12px;
       border-radius: var(--radius-sm);
     }
@@ -197,7 +199,7 @@
     .nav-user {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
     .nav-user-pill {
       display: flex;
@@ -433,56 +435,90 @@
       color: var(--danger);
     }
 
-    /* STRUK KUITANSI TICKET */
+    /* STRUK KUITANSI TICKET - TEMA PUTIH BERSIH (REAL PAPER RECEIPT) */
     .receipt-box {
-      background: #0d121c;
-      border: 2px dashed rgba(0, 255, 170, 0.4);
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1;
       border-radius: var(--radius-md);
-      padding: 22px;
-      color: #fff;
+      padding: 24px 20px;
+      color: #0f172a !important;
       font-size: 13px;
       position: relative;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     }
     .receipt-header {
       text-align: center;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
-      padding-bottom: 14px;
-      margin-bottom: 14px;
+      border-bottom: 2px dashed #94a3b8;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
     }
     .receipt-instansi {
       font-size: 17px;
       font-weight: 800;
-      color: var(--primary);
+      color: #0f172a !important;
+      letter-spacing: 0.5px;
     }
     .receipt-sub {
       font-size: 11px;
-      color: var(--text-muted);
+      color: #475569 !important;
+      margin-top: 2px;
+      line-height: 1.3;
     }
     .receipt-row {
       display: flex;
       justify-content: space-between;
-      padding: 5px 0;
+      align-items: baseline;
+      padding: 4px 0;
       font-size: 12px;
+      color: #1e293b !important;
     }
     .receipt-row .label {
-      color: var(--text-muted);
+      color: #475569 !important;
+      font-weight: 500;
+      text-align: left;
     }
     .receipt-row .val {
-      font-weight: 600;
-      color: #fff;
+      font-weight: 700;
+      color: #0f172a !important;
       text-align: right;
     }
     .receipt-divider {
-      border-top: 1px dashed rgba(255, 255, 255, 0.15);
-      margin: 10px 0;
+      border-top: 1px dashed #cbd5e1;
+      margin: 8px 0;
     }
     .receipt-total {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       padding: 8px 0;
       font-size: 15px;
       font-weight: 800;
-      color: var(--primary);
+      color: #047857 !important;
+      border-top: 2px dashed #94a3b8;
+      border-bottom: 2px dashed #94a3b8;
+      margin: 8px 0;
+    }
+
+    /* PRINT STYLING UNTUK STRUK KERTAS & THERMAL */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printReceiptArea, #printReceiptArea * {
+        visibility: visible;
+      }
+      #printReceiptArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        max-width: 320px !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 8px !important;
+        background: #fff !important;
+        color: #000 !important;
+      }
     }
 
     /* TOAST */
@@ -549,22 +585,62 @@
     }
 
     @media (max-width: 900px) {
+      .navbar {
+        padding: 0 12px;
+        height: 60px;
+      }
+      .nav-brand {
+        font-size: 15px;
+      }
+      .nav-brand i {
+        font-size: 18px;
+      }
+      .nav-user-pill .avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+      }
+      .nav-user-name {
+        font-size: 12px;
+      }
+      .nav-user-role {
+        font-size: 9px;
+      }
       .sidebar {
         position: fixed;
         left: -260px;
-        top: 65px;
+        top: 60px;
         bottom: 0;
       }
       .sidebar.open {
         transform: translateX(260px);
       }
       .main-content {
-        padding: 16px;
+        padding: 14px 10px;
+      }
+      .form-control {
+        font-size: 15px;
+        padding: 10px 12px;
+      }
+      .modal-content {
+        padding: 18px 14px;
+        border-radius: var(--radius-md);
       }
     }
   </style>
 </head>
 <body>
+
+  <div id="pwaInstallBanner" style="display: none; background: rgba(0, 255, 170, 0.15); border-bottom: 1px solid var(--border-accent); padding: 10px 16px; align-items: center; justify-content: space-between; font-size: 12px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-mobile-screen-button" style="color: var(--primary);"></i>
+      <span>Pasang aplikasi PAMSIMAS di layar utama HP Anda agar lebih cepat diakses!</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-primary btn-sm" onclick="triggerPwaInstall()">Pasang Sekarang</button>
+      <button class="btn btn-secondary btn-sm" onclick="dismissPwaBanner()">&times;</button>
+    </div>
+  </div>
 
   <nav class="navbar" id="appNavbar" style="display: none;">
     <div style="display: flex; align-items: center; gap: 14px;">
@@ -586,6 +662,16 @@
         <span id="textCloudStatus">Database Terhubung</span>
       </div>
 
+      <button class="btn btn-secondary btn-sm" id="btnNavBluetooth" onclick="openModalBluetoothPrinter()" title="Printer Thermal Bluetooth" style="padding: 6px 10px; gap: 6px;">
+        <i class="fa-solid fa-print" id="iconNavBt" style="color: var(--text-muted);"></i>
+        <span style="font-size: 11px;">Printer</span>
+      </button>
+
+      <button class="btn btn-secondary btn-sm" id="btnNavInstallPwa" onclick="triggerPwaInstall()" style="display: none; padding: 6px 10px; gap: 6px;" title="Pasang ke Layar Utama HP">
+        <i class="fa-solid fa-download" style="color: var(--primary);"></i>
+        <span style="font-size: 11px;">Install</span>
+      </button>
+
       <div class="nav-user-pill">
         <div class="avatar" id="navAvatar">A</div>
         <div class="nav-user-info">
@@ -603,9 +689,8 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
   <div class="app-layout">
-    <!-- SIDEBAR -->
     <aside class="sidebar" id="appSidebar" style="display: none;">
-      <div class="sidebar-label">Navigasi Utama</div>
+      <div class="sidebar-label" id="labelNavUtama">Navigasi Utama</div>
       <div class="nav-item active" id="navTab1" onclick="switchTab(1)">
         <i class="fa-solid fa-chart-pie"></i> Dashboard
       </div>
@@ -625,7 +710,7 @@
         <i class="fa-solid fa-wrench"></i> Pasang Baru (PSB)
       </div>
 
-      <div class="sidebar-label">Keuangan & Operasional</div>
+      <div class="sidebar-label" id="labelNavKeuangan">Keuangan & Operasional</div>
       <div class="nav-item" id="navTab7" onclick="switchTab(7)">
         <i class="fa-solid fa-book-bookmark"></i> Buku Kas Umum
       </div>
@@ -646,13 +731,12 @@
     <!-- CONTENT WRAPPER -->
     <main class="main-content" id="appMainContent">
 
-      <!-- ================= LOGIN VIEW ================= -->
       <section id="viewLogin" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
         <div class="glass-panel" style="width: 100%; max-width: 400px; padding: 36px 30px; text-align: center; border-color: var(--border-accent);">
           <div style="width: 65px; height: 65px; background: rgba(0, 255, 170, 0.1); border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
             <i class="fa-solid fa-faucet-drip" style="font-size: 28px; color: var(--primary);"></i>
           </div>
-          <h2 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 4px;">PAMSIMAS TIRTA MANDIRI</h2>
+          <h2 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 4px;" id="loginTitleInstansi">PAMSIMAS TIRTA MANDIRI</h2>
           <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 24px;">Sistem Informasi & Billing Pembayaran Air</p>
 
           <form onsubmit="event.preventDefault(); handleLogin();">
@@ -676,7 +760,6 @@
         </div>
       </section>
 
-      <!-- ================= DASHBOARD VIEW (TAB 1) ================= -->
       <section id="tab1" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -712,7 +795,6 @@
         </div>
       </section>
 
-      <!-- ================= DATA PELANGGAN (TAB 2) ================= -->
       <section id="tab2" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -747,7 +829,6 @@
         </div>
       </section>
 
-      <!-- ================= PETUGAS & AKUN (TAB 3) ================= -->
       <section id="tab3" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -776,7 +857,6 @@
         </div>
       </section>
 
-      <!-- ================= CATAT METER (TAB 4) ================= -->
       <section id="tab4" style="display: none;">
         <div class="glass-panel" style="max-width: 600px; margin: 0 auto; padding: 28px;">
           <h2 style="font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 6px;">
@@ -816,7 +896,6 @@
         </div>
       </section>
 
-      <!-- ================= KASIR & TAGIHAN (TAB 5) ================= -->
       <section id="tab5" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -856,7 +935,6 @@
         </div>
       </section>
 
-      <!-- ================= PASANG BARU (TAB 6) ================= -->
       <section id="tab6" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -888,7 +966,6 @@
         </div>
       </section>
 
-      <!-- ================= BUKU KAS UMUM (TAB 7) ================= -->
       <section id="tab7" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -919,7 +996,6 @@
         </div>
       </section>
 
-      <!-- ================= LOGISTIK MATERIAL (TAB 8) ================= -->
       <section id="tab8" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -949,7 +1025,6 @@
         </div>
       </section>
 
-      <!-- ================= LAPORAN GANGGUAN (TAB 9) ================= -->
       <section id="tab9" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -980,7 +1055,6 @@
         </div>
       </section>
 
-      <!-- ================= MONITORING NRW (TAB 10) ================= -->
       <section id="tab10" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -1011,7 +1085,6 @@
         </div>
       </section>
 
-      <!-- ================= PENGATURAN (TAB 11) ================= -->
       <section id="tab11" style="display: none;">
         <div class="glass-panel" style="max-width: 750px; margin: 0 auto; padding: 28px;">
           <h2 style="font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 6px;">
@@ -1113,7 +1186,6 @@
     </main>
   </div>
 
-  <!-- ================= MODAL KASIR PEMBAYARAN ================= -->
   <div class="modal-overlay" id="modalKasirPembayaran">
     <div class="modal-content" style="max-width: 480px;">
       <div class="modal-header">
@@ -1220,7 +1292,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL STRUK KUITANSI ================= -->
   <div class="modal-overlay" id="modalStrukKuitansi">
     <div class="modal-content" style="max-width: 440px;">
       <div class="modal-header">
@@ -1325,12 +1396,16 @@
           <i class="fa-solid fa-circle-check"></i> Sudah Bayar (Ganti Status Jadi Lunas)
         </button>
 
+        <button type="button" class="btn btn-primary" id="btnCetakThermalStruk" onclick="handleCetakThermalBt()" style="padding: 11px;">
+          <i class="fa-solid fa-print"></i> Cetak Thermal Bluetooth
+        </button>
+
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
           <button type="button" class="btn btn-secondary btn-sm" onclick="unduhStrukGambar()">
-            <i class="fa-solid fa-image"></i> Unduh Gambar
+            <i class="fa-solid fa-image"></i> Unduh Struk
           </button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="cetakStrukNota()">
-            <i class="fa-solid fa-print"></i> Cetak
+            <i class="fa-solid fa-file-invoice"></i> Cetak Dokumen
           </button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="kirimStrukWhatsApp()">
             <i class="fa-brands fa-whatsapp"></i> Kirim WA
@@ -1341,7 +1416,72 @@
     </div>
   </div>
 
-  <!-- ================= MODAL CARA BAYAR ================= -->
+  <div class="modal-overlay" id="modalBluetoothPrinter">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-print"></i> Printer Thermal Bluetooth</div>
+        <button class="modal-close" onclick="closeModal('modalBluetoothPrinter')">&times;</button>
+      </div>
+
+      <div style="text-align: center; padding: 10px 0 16px;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(0, 255, 170, 0.1); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+          <i class="fa-brands fa-bluetooth-b" id="btModalIcon" style="font-size: 28px; color: var(--primary);"></i>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px;" id="btModalStatusTitle">Belum Terhubung</h3>
+        <p style="font-size: 12px; color: var(--text-muted);" id="btModalStatusSub">Hubungkan ke printer kasir thermal 58mm atau 80mm nirkabel.</p>
+      </div>
+
+      <div class="glass-panel" style="padding: 14px; margin-bottom: 16px; background: rgba(0, 0, 0, 0.3);">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Nama Perangkat:</span>
+          <strong id="btDeviceNameText" style="color: #fff;">-</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 10px;">
+          <span style="color: var(--text-muted);">Koneksi Bluetooth:</span>
+          <span id="btStatusBadge" class="badge badge-warning">Siap Pindai</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; border-top: 1px dashed var(--border-color); padding-top: 8px; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Lebar Kertas Thermal:</span>
+          <select class="form-control" id="selectBtPaperWidth" onchange="simpanLebarKertasThermal(this.value)" style="width: 110px; padding: 4px 8px; height: 32px; font-size: 12px;">
+            <option value="58">58 mm</option>
+            <option value="80">80 mm</option>
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
+          <span style="color: var(--text-muted);">Auto-Reconnect:</span>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="checkBtAutoConnect" onchange="toggleBtAutoConnect(this.checked)" checked>
+            <span style="font-size: 11px; color: #fff;">Aktif</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn btn-secondary" id="btnReconnectLastBt" onclick="hubungkanPrinterTerakhir()" style="display: none; padding: 11px;">
+          <i class="fa-solid fa-rotate"></i> Sambungkan ke: <span id="textLastBtName" style="margin-left: 4px; font-weight: 700;">-</span>
+        </button>
+        <button type="button" class="btn btn-primary" id="btnMulaiCariBt" onclick="requestBluetoothPrinter()" style="padding: 12px;">
+          <i class="fa-brands fa-bluetooth-b"></i> Cari & Pilih Perangkat Bluetooth
+        </button>
+        <button type="button" class="btn btn-secondary" id="btnTestPrintBt" onclick="kirimTestPrintThermal()" style="display: none; padding: 10px;">
+          <i class="fa-solid fa-receipt"></i> Tes Cetak Struk Uji Coba
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" id="btnPutusBt" onclick="disconnectBluetoothPrinter()" style="display: none;">
+          <i class="fa-solid fa-link-slash"></i> Putuskan Hubungan Printer
+        </button>
+      </div>
+
+      <div style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 12px; font-size: 11px; color: var(--text-muted); line-height: 1.5;">
+        <strong style="color: #fff;"><i class="fa-solid fa-circle-info"></i> Petunjuk HP Android:</strong>
+        <br>1. Nyalakan Bluetooth & GPS/Lokasi pada pengaturan HP.
+        <br>2. Hidupkan printer thermal Bluetooth Anda.
+        <br>3. Klik tombol di atas, browser akan memunculkan daftar perangkat, lalu pilih printer Anda (misal: <em>POS-58, EPPOS, RPP02N</em>).
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalCaraBayar">
     <div class="modal-content" style="max-width: 420px;">
       <div class="modal-header">
@@ -1353,7 +1493,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL TAMBAH / EDIT PELANGGAN ================= -->
   <div class="modal-overlay" id="modalPelanggan">
     <div class="modal-content">
       <div class="modal-header">
@@ -1414,7 +1553,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL KARTU DIGITAL & QR CODE WARGA ================= -->
   <div class="modal-overlay" id="modalKartuPelanggan">
     <div class="modal-content" style="max-width: 440px;">
       <div class="modal-header">
@@ -1445,7 +1583,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL KONFIRMASI HAPUS PELANGGAN ================= -->
   <div class="modal-overlay" id="modalHapusPelanggan">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
       <div style="width: 55px; height: 55px; background: rgba(239, 68, 68, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;">
@@ -1463,7 +1600,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL TAMBAH PENGURUS ================= -->
   <div class="modal-overlay" id="modalPetugas">
     <div class="modal-content">
       <div class="modal-header">
@@ -1508,7 +1644,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL TRANSAKSI KAS ================= -->
   <div class="modal-overlay" id="modalTransaksiKas">
     <div class="modal-content">
       <div class="modal-header">
@@ -1542,7 +1677,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL ADUAN / GANGGUAN ================= -->
   <div class="modal-overlay" id="modalAduan">
     <div class="modal-content">
       <div class="modal-header">
@@ -1575,7 +1709,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL PASANG BARU ================= -->
   <div class="modal-overlay" id="modalPasangBaru">
     <div class="modal-content">
       <div class="modal-header">
@@ -1620,7 +1753,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL TAMBAH STOK MATERIAL ================= -->
   <div class="modal-overlay" id="modalTambahStok">
     <div class="modal-content">
       <div class="modal-header">
@@ -1657,7 +1789,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL INPUT AUDIT NRW ================= -->
   <div class="modal-overlay" id="modalInputNRW">
     <div class="modal-content">
       <div class="modal-header">
@@ -1692,7 +1823,6 @@
     /* =========================================================================
      * 🌐 PENGATURAN KONEKSI GOOGLE SPREADSHEET (HYBRID DUAL-MODE API GATEWAY)
      * ========================================================================= */
-    // URL Google Apps Script Anda langsung saya pasang di sini:
     const BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbzVex78pnEKM4zu8KvFr3_ImM7GSQ1XqKAT3iGHlg0_jpR9EtTgpgtipXuQEHhyW65V/exec";
 
     let isCloudOnline = false;
@@ -1808,6 +1938,111 @@
     let currentActiveTagihan = null;
     let activeMetodeBayar = "Tunai";
 
+    function handleLogin() {
+      const uInput = document.getElementById("loginUsername").value.trim();
+      const pInput = document.getElementById("loginPassword").value.trim();
+      if (!uInput || !pInput) {
+        showToast("Harap isi ID/Username dan kata sandi!", "warning");
+        return;
+      }
+
+      const btn = document.getElementById("btnLogin");
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa Akun...';
+      btn.disabled = true;
+
+      callBackend("loginUser", [uInput, pInput], function(res) {
+        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk ke Sistem';
+        btn.disabled = false;
+        if (res && res.success) {
+          applyLoginSuccess(res.user);
+        } else {
+          showToast((res && res.message) ? res.message : "Username atau Sandi salah!", "danger");
+        }
+      }, function() {
+        // Fallback demo/preview mode
+        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk ke Sistem';
+        btn.disabled = false;
+
+        const mockUsers = [
+          { username: "admin", password: "admin123", nama: "Administrator PAMSIMAS", role: "Admin", noTelp: "081234567890", idPelanggan: "-" },
+          { username: "kasir", password: "kasir123", nama: "Siti Aminah (Kasir)", role: "Kasir", noTelp: "081234567891", idPelanggan: "-" },
+          { username: "operator", password: "operator123", nama: "Budi Santoso (Operator)", role: "Operator Lapangan", noTelp: "081234567892", idPelanggan: "-" },
+          { username: "teknisi", password: "teknisi123", nama: "Joko Wibowo (Teknisi)", role: "Teknisi", noTelp: "081234567893", idPelanggan: "-" },
+          { username: "kurnia", password: "123456", nama: "Kurnia", role: "Pelanggan", noTelp: "6285321556762", idPelanggan: "PLG-0001" },
+          { username: "iwan", password: "123456", nama: "Iwan", role: "Pelanggan", noTelp: "625872368890", idPelanggan: "PLG-0004" }
+        ];
+
+        const cleanU = uInput.toLowerCase();
+        const found = mockUsers.find(x => 
+          (x.username.toLowerCase() === cleanU || x.idPelanggan.toLowerCase() === cleanU || x.noTelp === cleanU) && x.password === pInput
+        );
+
+        if (found) {
+          applyLoginSuccess(found);
+        } else {
+          showToast("Username / ID Pelanggan atau sandi tidak cocok!", "danger");
+        }
+      });
+    }
+
+    function applyLoginSuccess(user) {
+      currentUser = user;
+      document.getElementById("viewLogin").style.display = "none";
+      document.getElementById("appNavbar").style.display = "flex";
+      document.getElementById("appSidebar").style.display = "flex";
+
+      document.getElementById("navAvatar").innerText = (user.nama || "U").charAt(0).toUpperCase();
+      document.getElementById("navUserName").innerText = user.nama || user.username;
+      document.getElementById("navUserRole").innerText = user.role;
+
+      // FILTER HAK AKSES SIDEBAR: Pelanggan tidak boleh melihat Pasang Baru, Petugas, Buku Kas, dll
+      const isPelanggan = (user.role === "Pelanggan");
+      document.getElementById("navTab2").style.display = isPelanggan ? "none" : "flex"; // Buku Induk
+      document.getElementById("navTab3").style.display = isPelanggan ? "none" : "flex"; // Pengurus & Akun
+      document.getElementById("navTab4").style.display = isPelanggan ? "none" : "flex"; // Catat Meter
+      document.getElementById("navTab6").style.display = isPelanggan ? "none" : "flex"; // PASANG BARU DISEMBUNYIKAN UNTUK PELANGGAN
+      document.getElementById("navTab7").style.display = isPelanggan ? "none" : "flex"; // Buku Kas
+      document.getElementById("navTab8").style.display = isPelanggan ? "none" : "flex"; // Logistik
+      document.getElementById("navTab10").style.display = isPelanggan ? "none" : "flex"; // NRW
+      document.getElementById("navTab11").style.display = isPelanggan ? "none" : "flex"; // Pengaturan
+      
+      const labelKeuangan = document.getElementById("labelNavKeuangan");
+      if (labelKeuangan) labelKeuangan.style.display = isPelanggan ? "none" : "block";
+
+      const btnTambahPelanggan = document.getElementById("btnTambahPelanggan");
+      if (btnTambahPelanggan) btnTambahPelanggan.style.display = isPelanggan ? "none" : "inline-flex";
+
+      loadInitialData();
+      switchTab(1);
+      showToast("Selamat datang, " + user.nama + " (" + user.role + ")", "success");
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      document.getElementById("viewLogin").style.display = "flex";
+      document.getElementById("appNavbar").style.display = "none";
+      document.getElementById("appSidebar").style.display = "none";
+      for (let i = 1; i <= 11; i++) {
+        const t = document.getElementById("tab" + i);
+        if (t) t.style.display = "none";
+      }
+      document.getElementById("loginUsername").value = "";
+      document.getElementById("loginPassword").value = "";
+      showToast("Anda telah keluar dari sistem.", "info");
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const el = document.getElementById(inputId);
+      if (!el) return;
+      if (el.type === "password") {
+        el.type = "text";
+        btn.innerHTML = '<i class="fa-solid fa-eye-slash" style="color: var(--primary);"></i>';
+      } else {
+        el.type = "password";
+        btn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+      }
+    }
+
     // FORMAT RUPIAH DENGAN PEMISAH TITIK RIBUAN
     function formatRupiah(num) {
       const n = parseFloat(num) || 0;
@@ -1838,6 +2073,7 @@
 
     function showToast(msg, type = "success") {
       const container = document.getElementById("toastContainer");
+      if (!container) return;
       const el = document.createElement("div");
       el.className = "toast";
       if (type === "danger") el.style.borderLeftColor = "var(--danger)";
@@ -1880,110 +2116,6 @@
       if (backdrop) backdrop.classList.remove("active");
     }
 
-    /* FUNGSI TOGGLE LIHAT/SEMBUNYIKAN KATA SANDI (MATA) */
-    function togglePasswordVisibility(inputId, btnEl) {
-      const input = document.getElementById(inputId);
-      if (!input) return;
-      const icon = btnEl.querySelector("i");
-      if (input.type === "password") {
-        input.type = "text";
-        if (icon) {
-          icon.classList.remove("fa-eye");
-          icon.classList.add("fa-eye-slash");
-          icon.style.color = "var(--primary)";
-        }
-      } else {
-        input.type = "password";
-        if (icon) {
-          icon.classList.remove("fa-eye-slash");
-          icon.classList.add("fa-eye");
-          icon.style.color = "var(--text-muted)";
-        }
-      }
-    }
-
-    function handleLogin() {
-      const u = document.getElementById("loginUsername").value.trim();
-      const p = document.getElementById("loginPassword").value;
-      if (!u || !p) return showToast("Lengkapi username & sandi!", "warning");
-
-      const btn = document.getElementById("btnLogin");
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa Akun...';
-      btn.disabled = true;
-
-      callBackend("loginUser", [u, p], function(res) {
-        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk ke Sistem';
-        btn.disabled = false;
-        if (res && res.success) {
-          currentUser = res.user;
-          showToast("Selamat datang, " + currentUser.nama + "!", "success");
-          setupAuthenticatedUI();
-        } else {
-          showToast((res && res.message) ? res.message : "Kredensial login tidak cocok!", "danger");
-        }
-      }, function() {
-        // Fallback demo lokal
-        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk ke Sistem';
-        btn.disabled = false;
-        let role = "Admin";
-        const lowU = u.toLowerCase();
-        if (lowU.includes("kasir")) role = "Kasir";
-        else if (lowU.includes("operator")) role = "Operator Lapangan";
-        else if (lowU.includes("teknisi")) role = "Teknisi";
-        else if (lowU.includes("kurnia") || lowU.includes("rini") || lowU.includes("iwan") || lowU.startsWith("plg")) role = "Pelanggan";
-
-        currentUser = {
-          username: u,
-          nama: u.toUpperCase(),
-          role: role,
-          noTelp: "08123456789",
-          idPelanggan: (role === "Pelanggan" ? "PLG-0004" : "-")
-        };
-        showToast("Masuk sebagai " + role + " (Mode Demo)", "success");
-        setupAuthenticatedUI();
-      });
-    }
-
-    function setupAuthenticatedUI() {
-      document.getElementById("viewLogin").style.display = "none";
-      document.getElementById("appNavbar").style.display = "flex";
-      document.getElementById("appSidebar").style.display = "flex";
-
-      document.getElementById("navUserName").innerText = currentUser.nama;
-      document.getElementById("navUserRole").innerText = currentUser.role;
-      document.getElementById("navAvatar").innerText = currentUser.nama.charAt(0).toUpperCase();
-
-      // PROTEKSI ROLE HAK AKSES
-      const isPelanggan = (currentUser.role === "Pelanggan");
-      document.getElementById("navTab3").style.display = isPelanggan ? "none" : "flex"; // Petugas
-      document.getElementById("navTab4").style.display = isPelanggan ? "none" : "flex"; // Catat Meter
-      document.getElementById("navTab6").style.display = isPelanggan ? "none" : "flex"; // Pasang Baru (Dihilangkan untuk pelanggan!)
-      document.getElementById("navTab7").style.display = isPelanggan ? "none" : "flex"; // Buku Kas
-      document.getElementById("navTab8").style.display = isPelanggan ? "none" : "flex"; // Logistik
-      document.getElementById("navTab10").style.display = isPelanggan ? "none" : "flex"; // NRW
-      document.getElementById("navTab11").style.display = isPelanggan ? "none" : "flex"; // Settings
-
-      if (isPelanggan) {
-        document.getElementById("btnTambahPelanggan").style.display = "none";
-        document.getElementById("btnBroadcastWa").style.display = "none";
-      }
-
-      loadInitialData();
-      switchTab(1);
-    }
-
-    function handleLogout() {
-      currentUser = null;
-      document.getElementById("viewLogin").style.display = "flex";
-      document.getElementById("appNavbar").style.display = "none";
-      document.getElementById("appSidebar").style.display = "none";
-      for (let i = 1; i <= 11; i++) {
-        const el = document.getElementById("tab" + i);
-        if (el) el.style.display = "none";
-      }
-      showToast("Anda telah keluar dari aplikasi.", "info");
-    }
-
     function switchTab(idx) {
       for (let i = 1; i <= 11; i++) {
         const t = document.getElementById("tab" + i);
@@ -1994,9 +2126,8 @@
           else n.classList.remove("active");
         }
       }
-      if (window.innerWidth <= 900) {
-        document.getElementById("appSidebar").classList.remove("open");
-      }
+
+      closeSidebar();
 
       if (idx === 2) loadDataPelanggan();
       else if (idx === 3) loadDataPetugas();
@@ -2033,9 +2164,6 @@
     }
 
     function renderTablePelanggan() {
-      const tbody = document.getElementById("tbodyPelanggan");
-      tbody.innerHTML = "";
-
       const selMeter = document.getElementById("meterSelectPelanggan");
       const selAduan = document.getElementById("aduanIdPelanggan");
       if (selMeter) selMeter.innerHTML = '<option value="">-- Pilih Pelanggan --</option>';
@@ -2062,6 +2190,7 @@
     function filterPelangganTable() {
       const q = (document.getElementById("searchPelanggan").value || "").toLowerCase();
       const tbody = document.getElementById("tbodyPelanggan");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
       const filtered = rawPelangganList.filter(p => 
@@ -2106,7 +2235,8 @@
         tbody.appendChild(tr);
       });
 
-      document.getElementById("metricTotalPelanggan").innerText = rawPelangganList.length;
+      const mTot = document.getElementById("metricTotalPelanggan");
+      if (mTot) mTot.innerText = rawPelangganList.length;
     }
 
     function openModalPelanggan() {
@@ -2318,6 +2448,7 @@
 
     function renderTableTagihan() {
       const tbody = document.getElementById("tbodyTagihan");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
       let totalTertunggak = 0;
@@ -2350,14 +2481,17 @@
         tbody.appendChild(tr);
       });
 
-      document.getElementById("metricTagihanTertunggak").innerText = formatRupiah(totalTertunggak);
-      document.getElementById("metricKasLunas").innerText = formatRupiah(totalLunas);
+      const mTertunggak = document.getElementById("metricTagihanTertunggak");
+      const mLunas = document.getElementById("metricKasLunas");
+      if (mTertunggak) mTertunggak.innerText = formatRupiah(totalTertunggak);
+      if (mLunas) mLunas.innerText = formatRupiah(totalLunas);
     }
 
     function filterTagihanTable() {
       const q = (document.getElementById("searchTagihan").value || "").toLowerCase();
       const status = document.getElementById("filterStatusTagihan").value;
       const tbody = document.getElementById("tbodyTagihan");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
       const filtered = rawTagihanList.filter(t => {
@@ -2399,7 +2533,6 @@
       });
     }
 
-    // BUKA POPUP KASIR DENGAN RINCIAN LENGKAP
     function bukaModalKasirTagihan(idTagihan) {
       const t = rawTagihanList.find(x => x.idTagihan === idTagihan);
       if (!t) return;
@@ -2423,11 +2556,9 @@
       const defAdmin = parseFloat(appSettings.biaya_admin) || 0;
       document.getElementById("kasirBiayaAdmin").value = defAdmin;
 
-      // Konfigurasi Ketersediaan Tombol Metode Bayar
       document.getElementById("btnMetodeTransfer").style.display = (appSettings.aktif_transfer === "Ya") ? "inline-flex" : "none";
       document.getElementById("btnMetodeQris").style.display = (appSettings.aktif_qris === "Ya") ? "inline-flex" : "none";
 
-      // Muat Data Rekening & Gambar QRIS
       document.getElementById("kasirInfoRekening").innerText = appSettings.info_rekening || "-";
       document.getElementById("kasirNmidQris").innerText = appSettings.info_qris || "-";
 
@@ -2496,7 +2627,7 @@
 
     function unduhBarcodeQris() {
       const img = document.getElementById("kasirImgQris");
-      if (!img.src) return;
+      if (!img || !img.src) return;
       const a = document.createElement("a");
       a.href = img.src;
       a.download = "QRIS-PAMSIMAS.png";
@@ -2532,7 +2663,6 @@
       openModal("modalCaraBayar");
     }
 
-    // PROSES KE STRUK KUITANSI (STATUS BELUM LUNAS DULU, ADA TOMBOL SUDAH BAYAR)
     function prosesTinjauStokKasir() {
       if (!currentActiveTagihan) return;
       closeModal("modalKasirPembayaran");
@@ -2568,7 +2698,6 @@
       const finalGrand = t.calculatedGrandTotal || t.totalTagihan;
       document.getElementById("strukGrandTotal").innerText = formatRupiah(finalGrand);
 
-      // KALKULASI DIBAYAR DAN KEMBALIAN DI STRUK
       let dibayar = finalGrand;
       let kembalian = 0;
       if (activeMetodeBayar === "Tunai") {
@@ -2585,7 +2714,6 @@
       document.getElementById("strukMetodeBayar").innerText = activeMetodeBayar;
       document.getElementById("strukPetugasKasir").innerText = currentUser ? currentUser.nama : "Kasir";
 
-      // JIKA SUDAH LUNAS ATAU BELUM LUNAS
       const isLunas = (t.status === "Lunas");
       updateBadgeStruk(isLunas);
 
@@ -2597,82 +2725,70 @@
       const btnLunas = document.getElementById("btnKonfirmasiLunas");
 
       if (isLunas) {
-        badge.innerHTML = '<span style="color:var(--primary);"><i class="fa-solid fa-circle-check"></i> LUNAS (SAH)</span>';
+        badge.innerHTML = '<span style="color:#047857; font-weight:800;"><i class="fa-solid fa-circle-check"></i> LUNAS (SAH)</span>';
         btnLunas.style.display = "none";
       } else {
-        badge.innerHTML = '<span style="color:var(--danger);"><i class="fa-solid fa-clock"></i> BELUM LUNAS (MENUNGGU PEMBAYARAN)</span>';
+        badge.innerHTML = '<span style="color:#dc2626; font-weight:800;"><i class="fa-solid fa-clock"></i> BELUM LUNAS (MENUNGGU PEMBAYARAN)</span>';
         btnLunas.style.display = "block";
       }
     }
 
-    // KONFIRMASI PEMBAYARAN LUNAS (MENGUBAH STATUS DI SPREADSHEET & CATAT KAS MASUK)
     function konfirmasiStatusLunas() {
       if (!currentActiveTagihan) return;
+      const t = currentActiveTagihan;
       const btn = document.getElementById("btnKonfirmasiLunas");
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses Pelunasan...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan Pelunasan...';
       btn.disabled = true;
 
-      const idTagihan = currentActiveTagihan.idTagihan;
-      const kasirNama = currentUser ? currentUser.nama : "Kasir";
-
-      callBackend("bayarTagihan", [idTagihan, kasirNama, activeMetodeBayar], function(res) {
+      const namaKasir = currentUser ? currentUser.nama : "Kasir Loket";
+      callBackend("bayarTagihan", [t.idTagihan, namaKasir, activeMetodeBayar], function(res) {
         btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sudah Bayar (Ganti Status Jadi Lunas)';
         btn.disabled = false;
-
         if (res && res.success) {
-          showToast(res.message, "success");
-          currentActiveTagihan.status = "Lunas";
-          currentActiveTagihan.tglBayar = res.tglBayar;
+          t.status = "Lunas";
+          t.tglBayar = res.tglBayar || new Date().toLocaleString("id-ID");
+          t.petugasKasir = namaKasir;
           updateBadgeStruk(true);
-
-          // Update Data Lokal
-          const idx = rawTagihanList.findIndex(x => x.idTagihan === idTagihan);
-          if (idx !== -1) {
-            rawTagihanList[idx].status = "Lunas";
-            rawTagihanList[idx].tglBayar = res.tglBayar;
-            rawTagihanList[idx].metodeBayar = activeMetodeBayar;
-            rawTagihanList[idx].petugasKasir = kasirNama;
-          }
-          renderTableTagihan();
+          showToast(res.message || "Pembayaran berhasil dilunasi!", "success");
+          loadDataTagihan();
+          loadDataBukuKas();
         } else {
-          showToast((res && res.message) ? res.message : "Gagal memproses pelunasan!", "danger");
+          showToast((res && res.message) ? res.message : "Gagal memproses pembayaran!", "danger");
         }
       }, function() {
-        // Fallback Demo Lokal
         btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sudah Bayar (Ganti Status Jadi Lunas)';
         btn.disabled = false;
-
-        const now = new Date();
-        const tglStr = now.toLocaleDateString("id-ID") + " " + now.toLocaleTimeString("id-ID");
-        currentActiveTagihan.status = "Lunas";
-        currentActiveTagihan.tglBayar = tglStr;
+        t.status = "Lunas";
+        t.tglBayar = new Date().toLocaleString("id-ID");
+        t.petugasKasir = namaKasir;
         updateBadgeStruk(true);
-
-        const idx = rawTagihanList.findIndex(x => x.idTagihan === idTagihan);
+        
+        const idx = rawTagihanList.findIndex(x => x.idTagihan === t.idTagihan);
         if (idx !== -1) {
           rawTagihanList[idx].status = "Lunas";
-          rawTagihanList[idx].tglBayar = tglStr;
+          rawTagihanList[idx].tglBayar = t.tglBayar;
+          rawTagihanList[idx].petugasKasir = namaKasir;
           rawTagihanList[idx].metodeBayar = activeMetodeBayar;
-          rawTagihanList[idx].petugasKasir = kasirNama;
         }
         renderTableTagihan();
-        showToast("Pembayaran " + idTagihan + " dinyatakan LUNAS (Mode Demo)", "success");
+        showToast("Pembayaran " + t.idTagihan + " berhasil dilunasi (Mode Cadangan/Demo)", "success");
       });
     }
 
-    // UNDUH STRUK SEBAGAI GAMBAR PNG (HTML2CANVAS)
     function unduhStrukGambar() {
       const area = document.getElementById("printReceiptArea");
-      showToast("Sedang mengubah struk menjadi gambar...", "info");
+      showToast("Sedang membuat gambar nota kuitansi...", "info");
       html2canvas(area, {
-        backgroundColor: "#0d121c",
-        scale: 2
+        backgroundColor: "#ffffff",
+        scale: 2,
+        useCORS: true
       }).then(canvas => {
         const link = document.createElement("a");
-        link.download = "Struk-" + (currentActiveTagihan ? currentActiveTagihan.idTagihan : "PAMSIMAS") + ".png";
+        const idTag = (currentActiveTagihan ? currentActiveTagihan.idTagihan : "PAMSIMAS");
+        link.download = "Nota-" + idTag + ".png";
         link.href = canvas.toDataURL("image/png");
         link.click();
-        showToast("Struk gambar berhasil diunduh!", "success");
+        showToast("Struk berhasil diunduh sebagai gambar nota putih!", "success");
       }).catch(err => {
         showToast("Gagal mengunduh gambar struk.", "danger");
       });
@@ -2724,6 +2840,7 @@
 
     function renderTablePetugas() {
       const tbody = document.getElementById("tbodyPetugas");
+      if (!tbody) return;
       tbody.innerHTML = "";
       rawPetugasList.forEach(p => {
         const tr = document.createElement("tr");
@@ -2768,7 +2885,6 @@
       });
     }
 
-    // PENCATATAN METER
     function fetchMeterPelangganInfo() {
       const idPel = document.getElementById("meterSelectPelanggan").value;
       if (!idPel) return;
@@ -2813,7 +2929,6 @@
       });
     }
 
-    // PASANG BARU
     function loadDataPasangBaru() {
       callBackend("getPasangBaruList", ["Semua", ""], function(res) {
         if (res && res.success) {
@@ -2830,6 +2945,7 @@
 
     function renderTablePasangBaru() {
       const tbody = document.getElementById("tbodyPasangBaru");
+      if (!tbody) return;
       tbody.innerHTML = "";
       rawPasangBaruList.forEach(psb => {
         const tr = document.createElement("tr");
@@ -2883,7 +2999,6 @@
       });
     }
 
-    // BUKU KAS
     function loadDataBukuKas() {
       callBackend("getBukuKasList", ["Semua", ""], function(res) {
         if (res && res.success) {
@@ -2900,6 +3015,7 @@
 
     function renderTableBukuKas() {
       const tbody = document.getElementById("tbodyBukuKas");
+      if (!tbody) return;
       tbody.innerHTML = "";
       let lastSaldo = 0;
       rawBukuKasList.forEach(k => {
@@ -2916,7 +3032,8 @@
           '<td>' + k.petugas + '</td>';
         tbody.appendChild(tr);
       });
-      document.getElementById("metricSaldoKas").innerText = formatRupiah(lastSaldo);
+      const mSaldo = document.getElementById("metricSaldoKas");
+      if (mSaldo) mSaldo.innerText = formatRupiah(lastSaldo);
     }
 
     function openModalTransaksiKas() {
@@ -2957,7 +3074,6 @@
       });
     }
 
-    // LOGISTIK MATERIAL
     function loadDataMaterial() {
       callBackend("getInventarisList", [], function(res) {
         if (res && res.success) {
@@ -2967,7 +3083,7 @@
       }, function() {
         rawMaterialList = [
           { kodeBarang: "MAT-0001", namaBarang: "Water Meter Kuningan 1/2 Inch", satuan: "Unit", stok: 15, hargaSatuan: 185000, keterangan: "Standar SNI" },
-          { kodeBarang: "MAT-0002", PipaPVC: "Pipa PVC SNI 1/2 Inch (4m)", namaBarang: "Pipa PVC SNI 1/2 Inch (4m)", satuan: "Batang", stok: 40, hargaSatuan: 32000, keterangan: "Distribusi" }
+          { kodeBarang: "MAT-0002", namaBarang: "Pipa PVC SNI 1/2 Inch (4m)", satuan: "Batang", stok: 40, hargaSatuan: 32000, keterangan: "Distribusi" }
         ];
         renderTableMaterial();
       });
@@ -2975,6 +3091,7 @@
 
     function renderTableMaterial() {
       const tbody = document.getElementById("tbodyMaterial");
+      if (!tbody) return;
       tbody.innerHTML = "";
       rawMaterialList.forEach(m => {
         const tr = document.createElement("tr");
@@ -3023,7 +3140,6 @@
       });
     }
 
-    // ADUAN GANGGUAN
     function loadDataTiket() {
       callBackend("getTiketAduan", [currentUser ? currentUser.role : "Admin", currentUser ? currentUser.idPelanggan : "", "Semua"], function(res) {
         if (res && res.success) {
@@ -3040,6 +3156,7 @@
 
     function renderTableTiket() {
       const tbody = document.getElementById("tbodyTiketAduan");
+      if (!tbody) return;
       tbody.innerHTML = "";
       rawTiketList.forEach(tk => {
         const tr = document.createElement("tr");
@@ -3088,7 +3205,6 @@
       });
     }
 
-    // MONITORING NRW
     function loadDataNRW() {
       callBackend("getNRWList", [], function(res) {
         if (res && res.success) {
@@ -3105,6 +3221,7 @@
 
     function renderTableNRW() {
       const tbody = document.getElementById("tbodyNRW");
+      if (!tbody) return;
       tbody.innerHTML = "";
       rawNRWList.forEach(n => {
         const tr = document.createElement("tr");
@@ -3145,7 +3262,6 @@
       });
     }
 
-    // PENGATURAN APLIKASI
     function loadPengaturanAplikasi() {
       callBackend("getTarifSettings", [], function(res) {
         if (res && res.success && res.appSettings) {
@@ -3158,31 +3274,38 @@
     }
 
     function applyAppSettingsToUI() {
-      document.getElementById("navNamaInstansi").innerText = appSettings.nama_instansi;
-      document.getElementById("navSubInstansi").innerText = appSettings.sub_judul_instansi;
+      const nNama = document.getElementById("navNamaInstansi");
+      const nSub = document.getElementById("navSubInstansi");
+      const lTitle = document.getElementById("loginTitleInstansi");
+      if (nNama) nNama.innerText = appSettings.nama_instansi;
+      if (nSub) nSub.innerText = appSettings.sub_judul_instansi;
+      if (lTitle) lTitle.innerText = appSettings.nama_instansi;
 
-      document.getElementById("setNamaInstansi").value = appSettings.nama_instansi || "";
-      document.getElementById("setSubInstansi").value = appSettings.sub_judul_instansi || "";
-      document.getElementById("setAlamatInstansi").value = appSettings.alamat_instansi || "";
-      document.getElementById("setNoWaInstansi").value = appSettings.nomor_wa_callcenter || "";
-      document.getElementById("setTglTempo").value = appSettings.tgl_jatuh_tempo || "20";
-      document.getElementById("setNominalDenda").value = appSettings.nominal_denda || "5000";
-      document.getElementById("setBiayaAdmin").value = appSettings.biaya_admin || "0";
+      const sNama = document.getElementById("setNamaInstansi");
+      if (sNama) {
+        sNama.value = appSettings.nama_instansi || "";
+        document.getElementById("setSubInstansi").value = appSettings.sub_judul_instansi || "";
+        document.getElementById("setAlamatInstansi").value = appSettings.alamat_instansi || "";
+        document.getElementById("setNoWaInstansi").value = appSettings.nomor_wa_callcenter || "";
+        document.getElementById("setTglTempo").value = appSettings.tgl_jatuh_tempo || "20";
+        document.getElementById("setNominalDenda").value = appSettings.nominal_denda || "5000";
+        document.getElementById("setBiayaAdmin").value = appSettings.biaya_admin || "0";
 
-      document.getElementById("setAktifTransfer").value = appSettings.aktif_transfer || "Ya";
-      document.getElementById("setAktifQris").value = appSettings.aktif_qris || "Ya";
-      document.getElementById("setInfoRekening").value = appSettings.info_rekening || "";
-      document.getElementById("setInfoQris").value = appSettings.info_qris || "";
+        document.getElementById("setAktifTransfer").value = appSettings.aktif_transfer || "Ya";
+        document.getElementById("setAktifQris").value = appSettings.aktif_qris || "Ya";
+        document.getElementById("setInfoRekening").value = appSettings.info_rekening || "";
+        document.getElementById("setInfoQris").value = appSettings.info_qris || "";
 
-      const boxPrev = document.getElementById("boxPreviewQris");
-      const imgPrev = document.getElementById("imgPreviewQris");
-      if (appSettings.gambar_qris && appSettings.gambar_qris.startsWith("data:image")) {
-        imgPrev.src = appSettings.gambar_qris;
-        boxPrev.style.display = "block";
-        document.getElementById("setGambarQrisBase64").value = appSettings.gambar_qris;
-      } else {
-        boxPrev.style.display = "none";
-        document.getElementById("setGambarQrisBase64").value = "";
+        const boxPrev = document.getElementById("boxPreviewQris");
+        const imgPrev = document.getElementById("imgPreviewQris");
+        if (appSettings.gambar_qris && appSettings.gambar_qris.startsWith("data:image")) {
+          imgPrev.src = appSettings.gambar_qris;
+          boxPrev.style.display = "block";
+          document.getElementById("setGambarQrisBase64").value = appSettings.gambar_qris;
+        } else {
+          boxPrev.style.display = "none";
+          document.getElementById("setGambarQrisBase64").value = "";
+        }
       }
     }
 
@@ -3251,13 +3374,9 @@
       window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
     }
 
-    /* =========================================================================
-     * 📱 PWA (PROGRESSIVE WEB APP) - OPSIONAL PASANG KE LAYAR UTAMA
-     * ========================================================================= */
     let deferredPwaPrompt = null;
 
     function initPwaCapabilities() {
-      // 1. Daftarkan Web App Manifest secara dinamis
       try {
         const manifestObj = {
           name: "PAMSIMAS - Sistem Air Bersih",
@@ -3272,45 +3391,28 @@
               src: "https://placehold.co/192x192/0b0f19/00ffaa?text=PAMSIMAS",
               sizes: "192x192",
               type: "image/png"
-            },
-            {
-              src: "https://placehold.co/512x512/0b0f19/00ffaa?text=PAMSIMAS",
-              sizes: "512x512",
-              type: "image/png"
             }
           ]
         };
-        const manifestString = JSON.stringify(manifestObj);
-        const manifestBlob = new Blob([manifestString], { type: 'application/manifest+json' });
-        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
         const link = document.createElement('link');
         link.rel = 'manifest';
-        link.href = manifestUrl;
+        link.href = URL.createObjectURL(manifestBlob);
         document.head.appendChild(link);
-      } catch (err) {
-        console.warn("PWA manifest error:", err);
-      }
+      } catch (err) {}
 
-      // 2. Daftarkan In-Memory Service Worker
       if ('serviceWorker' in navigator) {
         const swScript = `
-          const CACHE_NAME = 'pamsimas-sw-v1';
           self.addEventListener('install', (e) => self.skipWaiting());
           self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-          self.addEventListener('fetch', (e) => {
-            e.respondWith(
-              fetch(e.request).catch(() => caches.match(e.request))
-            );
-          });
+          self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
         `;
         try {
           const swBlob = new Blob([swScript], { type: 'application/javascript' });
-          const swUrl = URL.createObjectURL(swBlob);
-          navigator.serviceWorker.register(swUrl).catch(() => {});
+          navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
         } catch (e) {}
       }
 
-      // 3. Tangkap event prompt instalasi
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPwaPrompt = e;
@@ -3329,7 +3431,7 @@
 
     function triggerPwaInstall() {
       if (!deferredPwaPrompt) {
-        showToast("Untuk memasang: buka menu browser (titik tiga) > pilih 'Tambahkan ke Layar Utama'", "info");
+        showToast("Buka menu browser (titik tiga) > pilih 'Tambahkan ke Layar Utama'", "info");
         return;
       }
       deferredPwaPrompt.prompt();
@@ -3347,44 +3449,149 @@
       if (banner) banner.style.display = 'none';
     }
 
-    /* =========================================================================
-     * 🖨️ WEB BLUETOOTH THERMAL PRINTER & ESC/POS ENGINE (58MM & 80MM)
-     * ========================================================================= */
     let btDevice = null;
     let btServer = null;
     let btPrintCharacteristic = null;
 
-    // UUID Layanan Standar Printer Thermal Bluetooth Populer (POS-58, EPPOS, dsb)
     const THERMAL_PRINTER_SERVICES = [
-      "000018f0-0000-1000-8000-00805f9b34fb", // Standar printer POS
-      "49535343-fe7d-41aa-8d19-005540d20b60", // ISSC serial service
-      "e7810a71-73ae-499d-8c15-faa9aef0c3f2", // Common thermal
-      "0000ff00-0000-1000-8000-00805f9b34fb"  // Custom generic
+      "000018f0-0000-1000-8000-00805f9b34fb",
+      "49535343-fe7d-41aa-8d19-005540d20b60",
+      "e7810a71-73ae-499d-8c15-faa9aef0c3f2",
+      "0000ff00-0000-1000-8000-00805f9b34fb",
+      "0000fee7-0000-1000-8000-00805f9b34fb",
+      "0000fff0-0000-1000-8000-00805f9b34fb"
     ];
 
-    async function connectBluetoothThermalPrinter() {
+    function openModalBluetoothPrinter() {
+      const savedWidth = localStorage.getItem("pamsimas_thermal_width") || "58";
+      const selWidth = document.getElementById("selectBtPaperWidth");
+      if (selWidth) selWidth.value = savedWidth;
+
+      const autoPref = localStorage.getItem("pamsimas_bt_autoconnect") !== "false";
+      const checkAuto = document.getElementById("checkBtAutoConnect");
+      if (checkAuto) checkAuto.checked = autoPref;
+
+      updateBluetoothUIState();
+      openModal("modalBluetoothPrinter");
+    }
+
+    function simpanLebarKertasThermal(val) {
+      localStorage.setItem("pamsimas_thermal_width", val || "58");
+      showToast("Ukuran kertas disetel ke " + val + " mm", "info");
+    }
+
+    function toggleBtAutoConnect(val) {
+      localStorage.setItem("pamsimas_bt_autoconnect", val ? "true" : "false");
+      showToast(val ? "Auto-reconnect aktif" : "Auto-reconnect dinonaktifkan", "info");
+    }
+
+    function updateBluetoothUIState() {
+      const isConnected = !!(btDevice && btDevice.gatt && btDevice.gatt.connected && btPrintCharacteristic);
+      const iconNav = document.getElementById("iconNavBt");
+      const modalIcon = document.getElementById("btModalIcon");
+      const title = document.getElementById("btModalStatusTitle");
+      const sub = document.getElementById("btModalStatusSub");
+      const devName = document.getElementById("btDeviceNameText");
+      const badge = document.getElementById("btStatusBadge");
+      const btnScan = document.getElementById("btnMulaiCariBt");
+      const btnReconnect = document.getElementById("btnReconnectLastBt");
+      const textLastBt = document.getElementById("textLastBtName");
+      const btnTest = document.getElementById("btnTestPrintBt");
+      const btnDisconnect = document.getElementById("btnPutusBt");
+
+      const savedName = localStorage.getItem("pamsimas_last_bt_name");
+
+      if (isConnected) {
+        if (iconNav) iconNav.style.color = "var(--primary)";
+        if (modalIcon) modalIcon.style.color = "var(--primary)";
+        if (title) title.innerText = "Printer Terhubung";
+        if (sub) sub.innerText = "Siap mencetak kuitansi thermal nirkabel.";
+        if (devName) devName.innerText = btDevice.name || "Bluetooth Printer";
+        if (badge) {
+          badge.className = "badge badge-success";
+          badge.innerText = "Terhubung";
+        }
+        if (btnScan) btnScan.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Ganti Perangkat Printer';
+        if (btnReconnect) btnReconnect.style.display = "none";
+        if (btnTest) btnTest.style.display = "inline-flex";
+        if (btnDisconnect) btnDisconnect.style.display = "inline-flex";
+      } else {
+        if (iconNav) iconNav.style.color = "var(--text-muted)";
+        if (modalIcon) modalIcon.style.color = "var(--warning)";
+        if (title) title.innerText = "Belum Terhubung";
+        if (sub) sub.innerText = "Pindai dan pilih printer thermal dari HP Anda.";
+        if (devName) devName.innerText = "-";
+        if (badge) {
+          badge.className = "badge badge-warning";
+          badge.innerText = "Terputus";
+        }
+        if (btnScan) btnScan.innerHTML = '<i class="fa-brands fa-bluetooth-b"></i> Cari & Pilih Perangkat Bluetooth';
+        if (btnReconnect && savedName) {
+          btnReconnect.style.display = "inline-flex";
+          if (textLastBt) textLastBt.innerText = savedName;
+        } else if (btnReconnect) {
+          btnReconnect.style.display = "none";
+        }
+        if (btnTest) btnTest.style.display = "none";
+        if (btnDisconnect) btnDisconnect.style.display = "none";
+      }
+    }
+
+    async function requestBluetoothPrinter() {
       if (!navigator.bluetooth) {
-        showToast("Browser tidak mendukung Web Bluetooth. Gunakan Chrome di Android/Laptop atau gunakan opsi Cetak Browser.", "warning");
-        return;
+        showToast("Browser tidak mendukung Web Bluetooth. Gunakan Chrome di Android/Komputer.", "warning");
+        return false;
       }
 
-      const btn = document.getElementById("btnKoneksiBt");
-      const txt = document.getElementById("textBtPrinterStatus");
-      const icon = document.getElementById("iconBtStatus");
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mencari...';
+      const btnScan = document.getElementById("btnMulaiCariBt");
+      if (btnScan) {
+        btnScan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membuka Pencarian Bluetooth...';
+      }
 
       try {
-        btDevice = await navigator.bluetooth.requestDevice({
+        const device = await navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
           optionalServices: THERMAL_PRINTER_SERVICES
         });
 
+        return await hubungkanPerangkatBluetooth(device);
+      } catch (err) {
+        console.warn("Koneksi Bluetooth dibatalkan/gagal:", err);
+        updateBluetoothUIState();
+        
+        // Deteksi jika diblokir oleh Permissions Policy (misal di iframe Google Apps Script)
+        const errMsg = String(err.message || err);
+        if (errMsg.includes("permissions policy") || errMsg.includes("disallowed")) {
+          showToast("Akses Bluetooth dibatasi di dalam Google Apps Script. Beralih ke Cetak Thermal Sistem.", "warning");
+          tanganiFallbackBluetoothIframe();
+        } else if (err.name !== 'NotFoundError') {
+          showToast("Bluetooth: " + errMsg, "danger");
+        }
+        return false;
+      }
+    }
+
+    function tanganiFallbackBluetoothIframe() {
+      // Jika dibuka di Apps Script / iframe, berikan panduan dan jalankan dialog cetak thermal
+      const infoMsg = confirm(
+        "Akses Web Bluetooth langsung dikunci oleh iframe Google Apps Script demi keamanan.\n\n" +
+        "PILIHAN ANDA:\n" +
+        "1. Cetak Sekarang (Sistem HP): Klik 'OK' untuk mencetak langsung ke printer thermal via dialog HP/Komputer.\n" +
+        "2. Bluetooth Nirkabel Langsung: Buka aplikasi melalui link Vercel Anda di Chrome HP (di Vercel tidak ada batasan iframe)."
+      );
+      if (infoMsg) {
+        cetakStrukNota();
+      }
+    }
+
+    async function hubungkanPerangkatBluetooth(device) {
+      try {
+        btDevice = device;
         btDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
 
-        txt.innerText = "Menghubungkan ke " + btDevice.name + "...";
+        showToast("Menyambungkan ke " + (btDevice.name || "Printer") + "...", "info");
         btServer = await btDevice.gatt.connect();
 
-        // Cari karakteristik printer yang mendukung Write
         let foundChar = null;
         const services = await btServer.getPrimaryServices();
         for (const s of services) {
@@ -3401,162 +3608,271 @@
         }
 
         if (!foundChar) {
-          throw new Error("Layanan cetak printer tidak ditemukan pada perangkat Bluetooth ini.");
+          throw new Error("Layanan cetak teks thermal tidak didukung oleh perangkat ini.");
         }
 
         btPrintCharacteristic = foundChar;
 
-        txt.innerText = "Terhubung: " + btDevice.name;
-        txt.style.color = "var(--primary)";
-        icon.style.color = "var(--primary)";
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Terhubung';
-        btn.className = "btn btn-primary btn-sm";
-        showToast("Printer Bluetooth " + btDevice.name + " berhasil terhubung!", "success");
-      } catch (err) {
-        console.warn("Koneksi Bluetooth gagal:", err);
-        txt.innerText = "Gagal terhubung";
-        txt.style.color = "var(--danger)";
-        btn.innerHTML = '<i class="fa-solid fa-link"></i> Sambungkan';
-        btn.className = "btn btn-secondary btn-sm";
-        if (err.name !== 'NotFoundError') {
-          showToast("Koneksi Bluetooth: " + (err.message || err), "danger");
+        if (btDevice.name) {
+          localStorage.setItem("pamsimas_last_bt_name", btDevice.name);
+          localStorage.setItem("pamsimas_last_bt_id", btDevice.id || "");
         }
+
+        updateBluetoothUIState();
+        showToast("Printer " + (btDevice.name || "Thermal") + " berhasil tersambung!", "success");
+        return true;
+      } catch (err) {
+        console.error("Gagal menyambungkan Bluetooth:", err);
+        btDevice = null;
+        btServer = null;
+        btPrintCharacteristic = null;
+        updateBluetoothUIState();
+        showToast("Gagal tersambung: " + (err.message || err), "danger");
+        return false;
       }
+    }
+
+    async function hubungkanPrinterTerakhir() {
+      const savedName = localStorage.getItem("pamsimas_last_bt_name");
+      const savedId = localStorage.getItem("pamsimas_last_bt_id");
+      if (!savedName) {
+        showToast("Belum ada printer Bluetooth yang tersimpan.", "info");
+        return;
+      }
+
+      if (!navigator.bluetooth || !navigator.bluetooth.getDevices) {
+        return await requestBluetoothPrinter();
+      }
+
+      showToast("Mencari printer " + savedName + "...", "info");
+      try {
+        const devices = await navigator.bluetooth.getDevices();
+        const matched = devices.find(d => (savedId && d.id === savedId) || (d.name && d.name === savedName));
+        if (matched) {
+          return await hubungkanPerangkatBluetooth(matched);
+        } else {
+          showToast("Printer " + savedName + " belum diizinkan ulang. Silakan pilih dari daftar.", "info");
+          return await requestBluetoothPrinter();
+        }
+      } catch (err) {
+        console.warn("Auto reconnect error:", err);
+        return await requestBluetoothPrinter();
+      }
+    }
+
+    async function inisialisasiAutoReconnectBluetooth() {
+      const autoPref = localStorage.getItem("pamsimas_bt_autoconnect") !== "false";
+      const savedName = localStorage.getItem("pamsimas_last_bt_name");
+      if (!autoPref || !savedName || !navigator.bluetooth || !navigator.bluetooth.getDevices) return;
+
+      try {
+        const devices = await navigator.bluetooth.getDevices();
+        const savedId = localStorage.getItem("pamsimas_last_bt_id");
+        const matched = devices.find(d => (savedId && d.id === savedId) || (d.name && d.name === savedName));
+        if (matched) {
+          await hubungkanPerangkatBluetooth(matched);
+        }
+      } catch (e) {}
+    }
+
+    function disconnectBluetoothPrinter() {
+      if (btDevice && btDevice.gatt && btDevice.gatt.connected) {
+        btDevice.gatt.disconnect();
+      }
+      onBluetoothDisconnected();
+      showToast("Koneksi printer telah diputus.", "info");
     }
 
     function onBluetoothDisconnected() {
-      const txt = document.getElementById("textBtPrinterStatus");
-      const icon = document.getElementById("iconBtStatus");
-      const btn = document.getElementById("btnKoneksiBt");
-      if (txt) {
-        txt.innerText = "Printer Bluetooth Terputus";
-        txt.style.color = "var(--text-muted)";
-      }
-      if (icon) icon.style.color = "var(--text-muted)";
-      if (btn) {
-        btn.innerHTML = '<i class="fa-solid fa-link"></i> Sambungkan';
-        btn.className = "btn btn-secondary btn-sm";
-      }
       btPrintCharacteristic = null;
       btServer = null;
+      updateBluetoothUIState();
     }
 
-    // Generator Perintah ESC/POS untuk Struk 58mm (Lebar 32 Karakter)
-    function buildEscPosData(tagihan) {
+    async function handleCetakThermalBt() {
+      if (!currentActiveTagihan) return;
+
+      // Cek apakah halaman berada di dalam iframe yang memblokir Web Bluetooth
+      const isInIframe = (window.self !== window.top);
+
+      const isConnected = !!(btDevice && btDevice.gatt && btDevice.gatt.connected && btPrintCharacteristic);
+      if (!isConnected) {
+        // Jika di dalam iframe Apps Script, beri tahu langsung tanpa melempar fatal error
+        if (isInIframe && !navigator.bluetooth) {
+          cetakStrukNota();
+          return;
+        }
+
+        showToast("Menyambungkan printer Bluetooth...", "info");
+        const success = await hubungkanPrinterTerakhir();
+        if (!success) {
+          return;
+        }
+      }
+
+      await cetakStrukBluetoothThermal();
+    }
+
+    function buildEscPosData(t) {
+      const paperWidth = localStorage.getItem("pamsimas_thermal_width") || "58";
+      const maxCols = (paperWidth === "80") ? 48 : 32;
+
+      function padLine(left, right) {
+        left = String(left || "");
+        right = String(right || "");
+        const spaceCount = maxCols - (left.length + right.length);
+        if (spaceCount <= 0) return left + " " + right + "\n";
+        return left + " ".repeat(spaceCount) + right + "\n";
+      }
+
+      function centerText(txt) {
+        txt = String(txt || "");
+        if (txt.length >= maxCols) return txt + "\n";
+        const pad = Math.floor((maxCols - txt.length) / 2);
+        return " ".repeat(pad) + txt + "\n";
+      }
+
+      function divider(ch = "-") {
+        return ch.repeat(maxCols) + "\n";
+      }
+
       const ESC = '\x1B';
       const GS = '\x1D';
 
-      let cmds = '';
-      cmds += ESC + '@'; // Inisialisasi printer
-      cmds += ESC + 'a' + '\x01'; // Text align center
+      let out = '';
+      out += ESC + '@';
+      out += ESC + 'a' + '\x01';
+      out += ESC + 'E' + '\x01';
+      out += centerText(appSettings.nama_instansi || "PAMSIMAS");
+      out += ESC + 'E' + '\x00';
+      out += centerText(appSettings.sub_judul_instansi || "Air Bersih Pedesaan");
+      out += centerText(appSettings.alamat_instansi || "");
+      out += divider('-');
 
-      // Header Instansi
-      cmds += ESC + '!' + '\x38'; // Double height + double width + bold
-      cmds += (appSettings.nama_instansi || "PAMSIMAS") + '\n';
-      cmds += ESC + '!' + '\x00'; // Normal font
-      cmds += (appSettings.sub_judul_instansi || "Pengelola Air Bersih") + '\n';
-      cmds += (appSettings.alamat_instansi || "") + '\n';
-      cmds += '--------------------------------\n'; // 32 Karakter 58mm
-
-      cmds += ESC + 'a' + '\x00'; // Text align left
-      const padRow = (lbl, val) => {
-        const totalLen = 32;
-        let l = (lbl || "").substring(0, 14);
-        let v = (val || "").substring(0, 18);
-        let spaces = totalLen - (l.length + v.length);
-        if (spaces < 1) spaces = 1;
-        return l + ' '.repeat(spaces) + v + '\n';
-      };
-
+      out += ESC + 'a' + '\x00';
       const now = new Date();
-      const tglCetak = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
-      cmds += padRow('Tgl Bayar:', tglCetak);
-      cmds += padRow('No Tagihan:', tagihan.idTagihan);
-      cmds += padRow('Pelanggan:', tagihan.idPelanggan);
-      cmds += padRow('Nama Warga:', tagihan.namaPelanggan);
-      cmds += padRow('Periode:', formatNamaPeriode(tagihan.periode));
-      cmds += '--------------------------------\n';
+      const tglTransaksi = now.toLocaleDateString("id-ID") + " " + now.toLocaleTimeString("id-ID");
+      out += padLine("Tgl Bayar:", tglTransaksi);
+      out += padLine("No. Tagihan:", t.idTagihan);
+      out += padLine("ID Warga:", t.idPelanggan);
+      out += padLine("Nama Warga:", t.namaPelanggan);
+      out += padLine("Periode:", formatNamaPeriode(t.periode));
+      out += divider('-');
 
-      cmds += padRow('Meter Lalu:', (tagihan.meterLalu || 0) + ' m3');
-      cmds += padRow('Meter Kini:', (tagihan.meterKini || 0) + ' m3');
-      cmds += padRow('Pemakaian:', (tagihan.pemakaianM3 || 0) + ' m3');
-      cmds += padRow('Biaya Air:', formatRupiah(tagihan.biayaAir));
-      cmds += padRow('Beban:', formatRupiah(tagihan.biayaBeban));
-      if (tagihan.denda > 0) {
-        cmds += padRow('Denda:', formatRupiah(tagihan.denda));
+      out += padLine("Meter Lalu-Kini:", t.meterLalu + " -> " + t.meterKini + " m3");
+      out += padLine("Pemakaian:", t.pemakaianM3 + " m3");
+      out += padLine("Biaya Air:", formatRupiah(t.biayaAir));
+      out += padLine(" (" + formatRupiah(t.tarifPerM3) + " x " + t.pemakaianM3 + " m3)", "");
+      out += padLine("Beban Abonemen:", formatRupiah(t.biayaBeban));
+
+      if (t.denda > 0) {
+        out += padLine("Denda Tempo:", formatRupiah(t.denda));
       }
-      if (tagihan.biayaAdminTerpasang > 0) {
-        cmds += padRow('Biaya Admin:', formatRupiah(tagihan.biayaAdminTerpasang));
+      const admin = t.biayaAdminTerpasang || 0;
+      if (admin > 0) {
+        out += padLine("Biaya Admin:", formatRupiah(admin));
       }
-      cmds += '--------------------------------\n';
 
-      // Total Tagihan Tebal & Besar
-      cmds += ESC + '!' + '\x18'; // Double height bold
-      const grandTotal = tagihan.calculatedGrandTotal || tagihan.totalTagihan;
-      cmds += padRow('TOTAL:', formatRupiah(grandTotal));
-      cmds += ESC + '!' + '\x00'; // Reset ke normal
+      out += divider('=');
+      const finalGrand = t.calculatedGrandTotal || t.totalTagihan;
+      out += ESC + 'E' + '\x01';
+      out += padLine("TOTAL TAGIHAN:", formatRupiah(finalGrand));
+      out += ESC + 'E' + '\x00';
 
-      const dibayar = tagihan.uangDibayarStruk || grandTotal;
-      const kembalian = tagihan.uangKembalianStruk || 0;
-      cmds += padRow('Dibayar:', formatRupiah(dibayar));
-      cmds += padRow('Kembalian:', formatRupiah(kembalian));
-      cmds += padRow('Metode:', activeMetodeBayar);
-      cmds += padRow('Kasir:', currentUser ? currentUser.nama : "Kasir");
+      const dibayar = t.uangDibayarStruk || finalGrand;
+      const kembalian = t.uangKembalianStruk || 0;
+      out += padLine("Jumlah Dibayar:", formatRupiah(dibayar));
+      out += padLine("Uang Kembalian:", formatRupiah(kembalian));
+      out += padLine("Metode Bayar:", activeMetodeBayar);
+      out += padLine("Petugas Kasir:", currentUser ? currentUser.nama : "Kasir");
+      out += divider('-');
 
-      cmds += '--------------------------------\n';
-      cmds += ESC + 'a' + '\x01'; // Center
-      cmds += ESC + '!' + '\x08'; // Bold
-      cmds += (tagihan.status === 'Lunas' ? '*** LUNAS (SAH) ***' : '*** BELUM LUNAS ***') + '\n';
-      cmds += ESC + '!' + '\x00';
-      cmds += 'Simpan bukti ini sebagai tanda\npembayaran sah air PAMSIMAS\n';
-      cmds += '\n\n\n'; // Feed paper
-      cmds += GS + 'V' + '\x41' + '\x00'; // Cut paper (jika didukung)
+      out += ESC + 'a' + '\x01';
+      out += ESC + 'E' + '\x01';
+      out += centerText(t.status === "Lunas" ? "*** LUNAS (SAH) ***" : "* BELUM LUNAS *");
+      out += ESC + 'E' + '\x00';
+      out += centerText("Terima kasih atas pembayaran Anda");
+      out += centerText("Simpan struk ini sebagai bukti sah");
+      out += '\n\n\n\n';
+      out += GS + 'V' + '\x41' + '\x00';
 
-      // Ubah string ke Uint8Array (Windows-1252 / ISO-8859-1)
-      const buffer = new Uint8Array(cmds.length);
-      for (let i = 0; i < cmds.length; i++) {
-        buffer[i] = cmds.charCodeAt(i) & 0xFF;
+      const buffer = new Uint8Array(out.length);
+      for (let i = 0; i < out.length; i++) {
+        buffer[i] = out.charCodeAt(i) & 0xFF;
       }
       return buffer;
+    }
+
+    async function kirimTestPrintThermal() {
+      if (!btPrintCharacteristic) {
+        showToast("Printer belum tersambung!", "warning");
+        return;
+      }
+
+      showToast("Mengirim struk uji coba...", "info");
+      try {
+        const ESC = '\x1B';
+        const paperWidth = localStorage.getItem("pamsimas_thermal_width") || "58";
+        const maxCols = (paperWidth === "80") ? 48 : 32;
+
+        let cmds = '';
+        cmds += ESC + '@';
+        cmds += ESC + 'a' + '\x01';
+        cmds += (appSettings.nama_instansi || "PAMSIMAS") + '\n';
+        cmds += 'TES KONEKSI PRINTER THERMAL\n';
+        cmds += '-'.repeat(maxCols) + '\n';
+        cmds += 'Format: ' + paperWidth + ' mm (' + maxCols + ' Kolom)\n';
+        cmds += 'Koneksi Bluetooth Berhasil!\n';
+        cmds += new Date().toLocaleString('id-ID') + '\n';
+        cmds += '-'.repeat(maxCols) + '\n\n\n\n';
+
+        const buffer = new Uint8Array(cmds.length);
+        for (let i = 0; i < cmds.length; i++) buffer[i] = cmds.charCodeAt(i) & 0xFF;
+
+        await kirimChunkDataPrinter(buffer);
+        showToast("Tes cetak berhasil dicetak!", "success");
+      } catch (e) {
+        showToast("Gagal tes cetak: " + (e.message || e), "danger");
+      }
+    }
+
+    async function kirimChunkDataPrinter(rawBytes) {
+      if (!btPrintCharacteristic) throw new Error("Karakteristik printer tidak ditemukan.");
+      const CHUNK_SIZE = 80;
+      for (let i = 0; i < rawBytes.length; i += CHUNK_SIZE) {
+        const chunk = rawBytes.slice(i, i + CHUNK_SIZE);
+        if (btPrintCharacteristic.writeValueWithoutResponse) {
+          await btPrintCharacteristic.writeValueWithoutResponse(chunk);
+        } else {
+          await btPrintCharacteristic.writeValue(chunk);
+        }
+        await new Promise(r => setTimeout(r, 25));
+      }
     }
 
     async function cetakStrukBluetoothThermal() {
       if (!currentActiveTagihan) return;
 
       if (!btPrintCharacteristic) {
-        showToast("Printer Bluetooth belum terhubung! Silakan klik 'Sambungkan' terlebih dahulu.", "warning");
-        await connectBluetoothThermalPrinter();
-        if (!btPrintCharacteristic) return;
+        showToast("Printer Bluetooth belum terhubung!", "warning");
+        return;
       }
 
-      showToast("Mengirim data ke printer thermal...", "info");
+      showToast("Mencetak nota kuitansi...", "info");
       try {
         const rawBytes = buildEscPosData(currentActiveTagihan);
-
-        // Kirim data dalam potongan chunk 100 bytes (MTU BLE compatibility)
-        const CHUNK_SIZE = 100;
-        for (let i = 0; i < rawBytes.length; i += CHUNK_SIZE) {
-          const chunk = rawBytes.slice(i, i + CHUNK_SIZE);
-          if (btPrintCharacteristic.writeValueWithoutResponse) {
-            await btPrintCharacteristic.writeValueWithoutResponse(chunk);
-          } else {
-            await btPrintCharacteristic.writeValue(chunk);
-          }
-          // Jeda microsecond agar buffer printer tidak meluap
-          await new Promise(r => setTimeout(r, 20));
-        }
-
+        await kirimChunkDataPrinter(rawBytes);
         showToast("Struk thermal berhasil dicetak!", "success");
       } catch (err) {
         console.error("Gagal cetak thermal:", err);
-        showToast("Gagal mencetak struk: " + (err.message || err), "danger");
+        showToast("Gagal mencetak: " + (err.message || err), "danger");
       }
     }
 
-    // Inisialisasi awal saat window dimuat
     window.onload = function() {
       loadPengaturanAplikasi();
       initPwaCapabilities();
+      inisialisasiAutoReconnectBluetooth();
       setTimeout(pingBackendHealth, 1000);
     };
   </script>
