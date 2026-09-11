@@ -2244,11 +2244,155 @@
     window.print();
   }
 
-  function cetakStrukBluetooth() {
-    showToast("Mengirim perintah cetak ke printer bluetooth thermal...", "info");
-    setTimeout(function() {
-      showToast("Struk kuitansi berhasil dicetak!", "success");
-    }, 1200);
+  async function cetakStrukBluetooth() {
+    if (!navigator.bluetooth) {
+      showToast("Browser tidak mendukung Web Bluetooth (gunakan Google Chrome / Edge dengan HTTPS)!", "warning");
+      return;
+    }
+
+    try {
+      showToast("Mencari printer thermal Bluetooth...", "info");
+
+      // Ambil data struk dari tampilan
+      var instansi = (document.getElementById("strukInstansi").innerText || "PAMSIMAS SAUYUNAN").trim();
+      var sub = (document.getElementById("strukSubInstansi").innerText || "").trim();
+      var alamat = (document.getElementById("strukAlamatInstansi").innerText || "").trim();
+      var tgl = (document.getElementById("strukTglTransaksi").innerText || "-").trim();
+      var idTag = (document.getElementById("strukIdTagihan").innerText || "-").trim();
+      var idPel = (document.getElementById("strukIdPelanggan").innerText || "-").trim();
+      var nama = (document.getElementById("strukNamaWarga").innerText || "-").trim();
+      var periode = (document.getElementById("strukPeriode").innerText || "-").trim();
+      var meter = (document.getElementById("strukMeterLaluKini").innerText || "-").trim();
+      var pakai = (document.getElementById("strukPemakaianAir").innerText || "-").trim();
+      var biayaAir = (document.getElementById("strukBiayaAir").innerText || "Rp 0").trim();
+      var rincianTarif = (document.getElementById("strukRincianTarif").innerText || "").trim();
+      var beban = (document.getElementById("strukBiayaBeban").innerText || "Rp 0").trim();
+      var admin = (document.getElementById("strukBiayaAdmin").innerText || "Rp 0").trim();
+      var denda = (document.getElementById("strukBiayaDenda").innerText || "Rp 0").trim();
+      var total = (document.getElementById("strukTotalBayar").innerText || "Rp 0").trim();
+      var metode = (document.getElementById("strukMetodeBayar").innerText || "Tunai").trim();
+      var terima = (document.getElementById("strukUangDiterima").innerText || "Rp 0").trim();
+      var kembali = (document.getElementById("strukUangKembalian").innerText || "Rp 0").trim();
+      var kasir = (document.getElementById("strukKasirMelayani").innerText || "Kasir Loket").trim();
+
+      // Helper pembagi dua kolom teks 32 karakter (kertas 58mm standar)
+      function padLine(left, right, width) {
+        width = width || 32;
+        var space = width - left.length - right.length;
+        if (space < 1) space = 1;
+        return left + " ".repeat(space) + right + "\n";
+      }
+
+      // Perintah ESC/POS dasar
+      var escInit = "\x1B\x40";       // Reset printer
+      var escCenter = "\x1B\x61\x01"; // Rata tengah
+      var escLeft = "\x1B\x61\x00";   // Rata kiri
+      var escBoldOn = "\x1B\x45\x01"; // Tebal ON
+      var escBoldOff = "\x1B\x45\x00";// Tebal OFF
+      var divider = "--------------------------------\n";
+
+      var receiptText = escInit;
+      receiptText += escCenter + escBoldOn + instansi + "\n" + escBoldOff;
+      if (sub) receiptText += sub + "\n";
+      if (alamat) receiptText += alamat + "\n";
+      receiptText += "KUITANSI TAGIHAN AIR\n";
+      receiptText += divider;
+      receiptText += escLeft;
+      receiptText += "Tgl    : " + tgl + "\n";
+      receiptText += "No.Tag : " + idTag + "\n";
+      receiptText += "ID Pel : " + idPel + "\n";
+      receiptText += "Nama   : " + nama + "\n";
+      receiptText += "Periode: " + periode + "\n";
+      receiptText += divider;
+      receiptText += padLine("Meter", meter, 32);
+      receiptText += padLine("Volume Pakai", pakai, 32);
+      receiptText += padLine("Biaya Air", biayaAir, 32);
+      if (rincianTarif) receiptText += "  " + rincianTarif + "\n";
+      receiptText += padLine("Beban Abonemen", beban, 32);
+      receiptText += padLine("Biaya Admin", admin, 32);
+      if (denda && denda !== "Rp 0") receiptText += padLine("Denda", denda, 32);
+      receiptText += divider;
+      receiptText += escBoldOn + padLine("TOTAL BAYAR", total, 32) + escBoldOff;
+      receiptText += padLine("Metode Bayar", metode, 32);
+      receiptText += padLine("Uang Diterima", terima, 32);
+      receiptText += padLine("Kembalian", kembali, 32);
+      receiptText += divider;
+      receiptText += escCenter;
+      receiptText += escBoldOn + "*** LUNAS (PEMBAYARAN SAH) ***\n" + escBoldOff;
+      receiptText += kasir + "\n";
+      receiptText += "Simpan struk sbg bukti sah.\n";
+      receiptText += "Terima Kasih\n\n\n\n";
+
+      // Encode ke biner bytes
+      var encoder = new TextEncoder();
+      var dataBytes = encoder.encode(receiptText);
+
+      // Pindai & minta izin perangkat Bluetooth
+      var device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: [
+          '000018f0-0000-1000-8000-00805f9b34fb', // Standard Printer Service
+          '0000ffe0-0000-1000-8000-00805f9b34fb', // HM-10 / CC2541 / Printer China umum
+          '0000ff00-0000-1000-8000-00805f9b34fb',
+          'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
+          '49535343-fe7d-4ae5-8fa9-9fafd205e455'  // ISSC Bluetooth SPP UART
+        ]
+      });
+
+      showToast("Menghubungkan ke " + (device.name || "Printer") + "...", "info");
+      var server = await device.gatt.connect();
+
+      // Cari characteristic yang mendukung penulisan (write)
+      var services = await server.getPrimaryServices();
+      var writeChar = null;
+
+      for (var s of services) {
+        try {
+          var chars = await s.getCharacteristics();
+          for (var c of chars) {
+            if (c.properties.write || c.properties.writeWithoutResponse) {
+              writeChar = c;
+              break;
+            }
+          }
+        } catch (e) {}
+        if (writeChar) break;
+      }
+
+      if (!writeChar) {
+        throw new Error("Karakteristik penulisan data printer tidak ditemukan.");
+      }
+
+      showToast("Mencetak struk kuitansi...", "info");
+
+      // Kirim dalam ukuran paket kecil (chunk) agar buffer printer tidak overflow
+      var chunkSize = 80;
+      for (var i = 0; i < dataBytes.length; i += chunkSize) {
+        var chunk = dataBytes.slice(i, i + chunkSize);
+        if (writeChar.properties.writeWithoutResponse) {
+          await writeChar.writeValueWithoutResponse(chunk);
+        } else {
+          await writeChar.writeValue(chunk);
+        }
+        await new Promise(function(resolve) { setTimeout(resolve, 35); });
+      }
+
+      showToast("Struk kuitansi berhasil dicetak ke printer Bluetooth!", "success");
+
+      // Disconnect setelah selesai cetak
+      setTimeout(function() {
+        if (device.gatt && device.gatt.connected) {
+          device.gatt.disconnect();
+        }
+      }, 1200);
+
+    } catch (err) {
+      if (err.name === "NotFoundError" || (err.message && err.message.indexOf("User cancelled") !== -1)) {
+        showToast("Pencarian printer Bluetooth dibatalkan.", "warning");
+      } else {
+        showToast("Gagal mencetak: " + err.message, "error");
+      }
+    }
   }
 
   function unduhStrukGambar() {
