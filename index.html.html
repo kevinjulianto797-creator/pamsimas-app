@@ -10,13 +10,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PAMSIMAS">
 
-  <!-- Font Awesome Icons & Google Font Inter -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- Library QR Code & HTML2Canvas untuk Cetak dan Unduh Struk -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
   <style>
     :root {
@@ -28,7 +27,6 @@
       --primary-hover: #00dd92;
       --primary-glow: rgba(0, 255, 170, 0.18);
       --secondary: #38bdf8;
-      --accent: #818cf8;
       --danger: #f87171;
       --warning: #fbbf24;
       --success: #34d399;
@@ -39,7 +37,6 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
-      --radius-xl: 22px;
       --font-main: 'Inter', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
       --sidebar-width: 260px;
@@ -62,14 +59,12 @@
       flex-direction: column;
     }
 
-    /* PWA Banner */
     #pwaInstallBanner {
       display: none;
       background: linear-gradient(90deg, #064e3b, #065f46);
       color: #ecfdf5;
       padding: 8px 14px;
       font-size: 12px;
-      display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid rgba(0, 255, 170, 0.3);
@@ -83,7 +78,6 @@
       position: relative;
     }
 
-    /* TOP NAVBAR */
     .top-navbar {
       position: fixed;
       top: 0;
@@ -183,12 +177,7 @@
       border: 1px solid rgba(0, 255, 170, 0.3);
       color: var(--primary);
       cursor: pointer;
-      transition: 0.2s;
       white-space: nowrap;
-    }
-
-    .badge-status-db:hover {
-      background: rgba(0, 255, 170, 0.18);
     }
 
     .badge-status-db .pulse-dot {
@@ -224,7 +213,6 @@
     .btn-nav-action:hover {
       border-color: var(--primary);
       color: var(--primary);
-      background: var(--bg-card-hover);
     }
 
     .nav-user-profile {
@@ -321,6 +309,16 @@
       display: block;
     }
 
+    /* Mode melipat sidebar di Desktop */
+    body.sidebar-collapsed .sidebar-drawer {
+      transform: translateX(-100%);
+    }
+
+    body.sidebar-collapsed .main-viewport {
+      margin-left: 0 !important;
+      width: 100% !important;
+    }
+
     .nav-group-title {
       font-size: 10px;
       font-weight: 700;
@@ -363,18 +361,21 @@
       font-weight: 700;
     }
 
-    /* MAIN CONTENT VIEWPORT */
     .main-viewport {
       flex: 1;
+      min-width: 0;
+      width: calc(100% - var(--sidebar-width));
       margin-top: 56px;
       margin-left: var(--sidebar-width);
       padding: 20px;
       min-height: calc(100vh - 56px);
-      transition: margin-left 0.3s;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+      overflow-x: hidden;
     }
 
     body.not-logged-in .main-viewport {
       margin-left: 0 !important;
+      width: 100% !important;
       padding: 16px;
     }
 
@@ -424,7 +425,6 @@
       margin-top: 3px;
     }
 
-    /* METRIC CARDS */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -441,12 +441,6 @@
       flex-direction: column;
       justify-content: space-between;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s, border-color 0.2s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(0, 255, 170, 0.4);
     }
 
     .stat-header {
@@ -531,7 +525,6 @@
       color: var(--text-main);
       font-size: 13px;
       outline: none;
-      transition: 0.2s;
     }
 
     .search-input-wrap input:focus {
@@ -541,13 +534,33 @@
 
     .table-container {
       width: 100%;
+      max-width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
     }
 
+    .table-container::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: var(--bg-card);
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 170, 0.3);
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
     table.data-table {
       width: 100%;
+      min-width: 1050px;
       border-collapse: collapse;
       text-align: left;
       font-size: 12.5px;
@@ -570,13 +583,13 @@
       border-bottom: 1px solid var(--border-color);
       color: var(--text-main);
       vertical-align: middle;
+      white-space: nowrap;
     }
 
     table.data-table tbody tr:hover {
       background: var(--bg-card-hover);
     }
 
-    /* BUTTONS */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -687,12 +700,6 @@
       padding: 22px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       position: relative;
-      animation: modalSlide 0.25s ease-out;
-    }
-
-    @keyframes modalSlide {
-      from { opacity: 0; transform: scale(0.96) translateY(10px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .modal-header {
@@ -725,7 +732,6 @@
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      transition: 0.2s;
     }
 
     .modal-close:hover {
@@ -754,7 +760,6 @@
       color: var(--text-main);
       font-size: 13.5px;
       outline: none;
-      transition: 0.2s;
     }
 
     .form-control:focus {
@@ -777,10 +782,6 @@
       cursor: pointer;
       font-size: 14px;
       padding: 4px;
-    }
-
-    .password-toggle-btn:hover {
-      color: var(--primary);
     }
 
     .receipt-box {
@@ -823,10 +824,6 @@
       color: #1e293b;
     }
 
-    .receipt-row.bold {
-      font-weight: 700;
-    }
-
     .receipt-divider {
       border-top: 1px dashed #cbd5e1;
       margin: 10px 0;
@@ -835,7 +832,7 @@
     .receipt-total-row {
       display: flex;
       justify-content: space-between;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 800;
       color: #047857;
       padding: 6px 0;
@@ -865,7 +862,6 @@
       border: 1px solid #fca5a5;
     }
 
-    /* TOAST NOTIFICATION */
     .toast-box {
       position: fixed;
       bottom: 20px;
@@ -894,70 +890,28 @@
 
     .toast-success { background: #059669; border-left: 4px solid var(--primary); }
     .toast-error { background: #dc2626; border-left: 4px solid #f87171; }
-    .toast-info { background: #0284c7; border-left: 4px solid #38bdf8; }
+    .toast-info { background: #0284c7; border-left: 4px solid var(--secondary); }
 
+    /* Media query khusus layar ponsel */
     @media (max-width: 768px) {
-      .sidebar-drawer {
-        transform: translateX(-100%);
-      }
-
-      .sidebar-drawer.open {
-        transform: translateX(0);
-      }
-
-      .main-viewport {
-        margin-left: 0;
-        padding: 14px;
-      }
-
-      .nav-brand-sub {
-        display: none;
-      }
-
-      .badge-status-db span {
-        display: none;
-      }
-
-      .btn-nav-action span {
-        display: none;
-      }
-
-      .nav-user-info {
-        display: none;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
+      .sidebar-drawer { transform: translateX(-100%); }
+      .sidebar-drawer.open { transform: translateX(0); }
+      .main-viewport { margin-left: 0; width: 100%; padding: 14px; }
+      .nav-brand-sub, .badge-status-db span, .btn-nav-action span, .nav-user-info { display: none; }
+      .stats-grid { grid-template-columns: 1fr; }
     }
 
-    /* THERMAL PRINT MEDIA */
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #areaCetakThermal, #areaCetakThermal * {
-        visibility: visible;
-      }
+      body * { visibility: hidden; }
+      #areaCetakThermal, #areaCetakThermal * { visibility: visible; }
       #areaCetakThermal {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 58mm;
-        margin: 0;
-        padding: 4mm;
-        background: #fff !important;
-        color: #000 !important;
-      }
-      .no-print {
-        display: none !important;
+        position: absolute; left: 0; top: 0; width: 58mm; margin: 0; padding: 4mm; background: #fff !important; color: #000 !important;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- BANNER INSTALASI PWA -->
   <div id="pwaInstallBanner">
     <div style="display: flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-mobile-screen-button"></i>
@@ -969,7 +923,6 @@
     </div>
   </div>
 
-  <!-- TOP NAVBAR -->
   <header class="top-navbar">
     <div class="nav-left">
       <button class="btn-hamburger" id="btnHamburgerNav" style="display: none;" onclick="toggleSidebar()" title="Menu Navigasi">
@@ -985,25 +938,21 @@
     </div>
 
     <div class="nav-right">
-      <!-- Lencana Status Database -->
       <div class="badge-status-db" id="badgeDbStatus" onclick="checkBackendHealth()" title="Klik untuk cek status server">
         <div class="pulse-dot"></div>
         <span id="textDbStatus">Database Terhubung</span>
       </div>
 
-      <!-- Tombol Printer Bluetooth -->
       <button class="btn-nav-action" onclick="openModalBluetoothPrinter()" title="Koneksi Printer Bluetooth Thermal">
         <i class="fa-solid fa-print" style="color: var(--primary);"></i>
         <span>Printer</span>
       </button>
 
-      <!-- Tombol Install PWA -->
       <button class="btn-nav-action" id="btnInstallPwaNav" style="display: none;" onclick="triggerPwaInstall()" title="Pasang di Layar Utama HP">
         <i class="fa-solid fa-download" style="color: var(--secondary);"></i>
         <span>Install</span>
       </button>
 
-      <!-- User Profile -->
       <div class="nav-user-profile" id="boxUserProfile" style="display: none;">
         <div class="nav-user-avatar" id="navUserAvatar">A</div>
         <div class="nav-user-info">
@@ -1012,7 +961,6 @@
         </div>
       </div>
 
-      <!-- Tombol Logout -->
       <button class="btn-logout" id="btnLogoutNav" style="display: none;" onclick="handleLogout()" title="Keluar Akun">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
       </button>
@@ -1022,7 +970,6 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
   <div class="app-wrapper">
-    <!-- SIDEBAR DRAWER -->
     <aside class="sidebar-drawer" id="sidebarDrawer">
       <div>
         <div class="nav-group-title">Menu Utama</div>
@@ -1061,7 +1008,6 @@
         </a>
       </div>
 
-      <!-- Quick Actions at Sidebar Bottom -->
       <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 10px;">
         <button class="btn btn-secondary btn-sm" style="width: 100%; margin-bottom: 6px;" onclick="openModalBluetoothPrinter()">
           <i class="fa-solid fa-print"></i> Pengaturan Printer
@@ -1074,7 +1020,6 @@
 
     <main class="main-viewport">
       
-      <!-- VIEW: LOGIN (Jika Belum Masuk) -->
       <div id="viewLogin" class="view-tab active">
         <div style="min-height: 70vh; display: flex; align-items: center; justify-content: center;">
           <div class="card-panel" style="width: 100%; max-width: 400px; padding: 28px; text-align: center;">
@@ -1106,7 +1051,6 @@
         </div>
       </div>
 
-      <!-- VIEW: DASHBOARD -->
       <div id="tabDashboard" class="view-tab">
         <div class="page-header">
           <div>
@@ -1154,7 +1098,6 @@
         </div>
       </div>
 
-      <!-- VIEW: KASIR & TAGIHAN -->
       <div id="tabKasir" class="view-tab">
         <div class="page-header">
           <div>
@@ -1206,7 +1149,6 @@
         </div>
       </div>
 
-      <!-- VIEW: DATA PELANGGAN -->
       <div id="tabPelanggan" class="view-tab">
         <div class="page-header">
           <div>
@@ -1249,19 +1191,26 @@
         </div>
       </div>
 
-      <!-- VIEW: CATAT METER LAPANGAN -->
       <div id="tabCatatMeter" class="view-tab">
         <div class="page-header">
           <div>
             <h1 class="page-title"><i class="fa-solid fa-gauge-high"></i> Catat Meter Lapangan</h1>
             <p class="page-subtitle">Pencatatan angka stand meter bulanan warga oleh operator lapangan.</p>
           </div>
+          <button class="btn btn-primary" onclick="bukaScanQrMeter()">
+            <i class="fa-solid fa-qrcode"></i> Scan QR Meter Pelanggan
+          </button>
         </div>
 
         <div class="card-panel" style="max-width: 580px; margin: 0 auto;">
           <form onsubmit="event.preventDefault(); submitCatatMeter();">
             <div class="form-group">
-              <label class="form-label">Pilih Pelanggan</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label class="form-label" style="margin-bottom: 0;">Pilih Pelanggan</label>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="bukaScanQrMeter()">
+                  <i class="fa-solid fa-camera" style="color: var(--primary);"></i> Pindai Barcode QR
+                </button>
+              </div>
               <select id="catatIdPelanggan" class="form-control" required onchange="loadPelangganMeterInfo()">
                 <option value="">-- Pilih Pelanggan --</option>
               </select>
@@ -1273,12 +1222,12 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Meter Lalu (m³)</label>
-                <input type="number" id="catatMeterLalu" class="form-control" readonly style="background: rgba(255,255,255,0.03);">
+                <input type="text" id="catatMeterLalu" class="form-control" readonly style="background: rgba(255,255,255,0.03);">
               </div>
             </div>
             <div class="form-group">
               <label class="form-label">Angka Meter Kini (m³)</label>
-              <input type="number" id="catatMeterKini" class="form-control" required placeholder="Masukkan angka stand meter" oninput="kalkulasiPemakaianMeter()">
+              <input type="text" inputmode="numeric" id="catatMeterKini" class="form-control" required placeholder="Masukkan angka stand meter" oninput="formatRibuanInput(this); kalkulasiPemakaianMeter();">
             </div>
             <div class="card-panel" style="background: rgba(0, 255, 170, 0.05); border-color: rgba(0, 255, 170, 0.2); padding: 12px; margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; font-size: 13px;">
@@ -1293,7 +1242,6 @@
         </div>
       </div>
 
-      <!-- VIEW: LAPORAN GANGGUAN / ADUAN -->
       <div id="tabAduan" class="view-tab">
         <div class="page-header">
           <div>
@@ -1329,14 +1277,15 @@
         </div>
       </div>
 
-      <!-- VIEW: PASANG BARU -->
       <div id="tabPasangBaru" class="view-tab">
         <div class="page-header">
           <div>
             <h1 class="page-title"><i class="fa-solid fa-user-plus"></i> Pasang Baru (PSB)</h1>
             <p class="page-subtitle">Pendaftaran sambungan rumah baru untuk warga yang belum berlangganan.</p>
           </div>
-          <button class="btn btn-primary" onclick="openModalPasangBaru()"><i class="fa-solid fa-plus"></i> Daftar Sambungan Baru</button>
+          <button class="btn btn-primary" onclick="openModalPasangBaru()">
+            <i class="fa-solid fa-plus"></i> Pendaftaran Baru (PSB)
+          </button>
         </div>
         <div class="card-panel">
           <div class="table-container">
@@ -1362,14 +1311,15 @@
         </div>
       </div>
 
-      <!-- VIEW: BUKU KAS UMUM -->
       <div id="tabBukuKas" class="view-tab">
         <div class="page-header">
           <div>
             <h1 class="page-title"><i class="fa-solid fa-book-bookmark"></i> Buku Kas Umum (BKU)</h1>
             <p class="page-subtitle">Mutasi kas masuk pelunasan air dan kas keluar operasional perbaikan pipa.</p>
           </div>
-          <button class="btn btn-primary" onclick="openModalBukuKas()"><i class="fa-solid fa-plus"></i> Catat Transaksi Kas</button>
+          <button class="btn btn-primary" onclick="openModalTransaksiKas()">
+            <i class="fa-solid fa-plus"></i> Catat Transaksi Kas
+          </button>
         </div>
         <div class="card-panel">
           <div class="table-container">
@@ -1394,14 +1344,15 @@
         </div>
       </div>
 
-      <!-- VIEW: LOGISTIK MATERIAL -->
       <div id="tabInventaris" class="view-tab">
         <div class="page-header">
           <div>
             <h1 class="page-title"><i class="fa-solid fa-boxes-stacked"></i> Logistik & Inventaris Material</h1>
             <p class="page-subtitle">Stok kran, pipa PVC, klem, dan water meter cadangan teknisi.</p>
           </div>
-          <button class="btn btn-primary" onclick="openModalMaterial()"><i class="fa-solid fa-plus"></i> Tambah Material</button>
+          <button class="btn btn-primary" onclick="openModalTambahMaterial()">
+            <i class="fa-solid fa-plus"></i> Tambah Material Baru
+          </button>
         </div>
         <div class="card-panel">
           <div class="table-container">
@@ -1425,14 +1376,15 @@
         </div>
       </div>
 
-      <!-- VIEW: MONITORING NRW -->
       <div id="tabNrw" class="view-tab">
         <div class="page-header">
           <div>
             <h1 class="page-title"><i class="fa-solid fa-droplet-slash"></i> Monitoring NRW (Kehilangan Air)</h1>
             <p class="page-subtitle">Perbandingan meter induk tandon vs total meteran air warga yang terjual.</p>
           </div>
-          <button class="btn btn-primary" onclick="openModalNrw()"><i class="fa-solid fa-plus"></i> Catat Meter Tandon</button>
+          <button class="btn btn-primary" onclick="openModalCatatNrw()">
+            <i class="fa-solid fa-plus"></i> Catat Meter Tandon (NRW)
+          </button>
         </div>
         <div class="card-panel">
           <div class="table-container">
@@ -1448,17 +1400,17 @@
                   <th>% Loss</th>
                   <th>Status</th>
                   <th>Petugas</th>
+                  <th style="text-align: center;">Aksi</th>
                 </tr>
               </thead>
               <tbody id="tbodyNrw">
-                <tr><td colspan="9" style="text-align: center; padding: 20px; color: var(--text-muted);">Memuat monitoring NRW...</td></tr>
+                <tr><td colspan="10" style="text-align: center; padding: 20px; color: var(--text-muted);">Memuat monitoring NRW...</td></tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- VIEW: PETUGAS & AKUN -->
       <div id="tabPetugas" class="view-tab">
         <div class="page-header">
           <div>
@@ -1490,7 +1442,6 @@
         </div>
       </div>
 
-      <!-- VIEW: PENGATURAN SISTEM -->
       <div id="tabPengaturan" class="view-tab">
         <div class="page-header">
           <div>
@@ -1499,7 +1450,8 @@
           </div>
           <button class="btn btn-primary" onclick="simpanPengaturanSistem()"><i class="fa-solid fa-save"></i> Simpan Konfigurasi</button>
         </div>
-        <div class="card-panel" style="max-width: 650px;">
+        <div class="card-panel" style="max-width: 750px;">
+          <h3 style="font-size: 14px; color: var(--primary); margin-bottom: 12px; font-weight: 700;">Identitas Lembaga & Kebijakan Tagihan</h3>
           <div class="form-group">
             <label class="form-label">Nama Instansi / BPSPAM</label>
             <input type="text" id="setNamaInstansi" class="form-control" value="PAMSIMAS SAUYUNAN">
@@ -1519,17 +1471,82 @@
             </div>
             <div class="form-group">
               <label class="form-label">Nominal Denda Terlambat (Rp)</label>
-              <input type="number" id="setNominalDenda" class="form-control" value="5000">
+              <input type="text" inputmode="numeric" id="setNominalDenda" class="form-control" value="5.000" oninput="formatRibuanInput(this)">
             </div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="form-group">
               <label class="form-label">Biaya Admin Loket (Rp)</label>
-              <input type="number" id="setBiayaAdmin" class="form-control" value="3000">
+              <input type="text" inputmode="numeric" id="setBiayaAdmin" class="form-control" value="3.000" oninput="formatRibuanInput(this)">
             </div>
             <div class="form-group">
               <label class="form-label">No. WA Call Center Pengurus</label>
               <input type="text" id="setNoWaCallCenter" class="form-control" value="081234567890">
+            </div>
+          </div>
+
+          <h3 style="font-size: 14px; color: var(--primary); margin: 20px 0 10px; font-weight: 700;">Tarif Golongan Pelanggan Air</h3>
+          <div class="table-container" style="margin-bottom: 20px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Golongan</th>
+                  <th>Beban / Abonemen (Rp)</th>
+                  <th>Tarif per m³ (Rp)</th>
+                  <th>Biaya Pasang Baru (Rp)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>R-1</strong> <small style="color: var(--text-muted);">(Rumah Tangga)</small></td>
+                  <td><input type="text" inputmode="numeric" id="trf_beban_R1" class="form-control" value="5.000" oninput="formatRibuanInput(this)"></td>
+                  <td><input type="text" inputmode="numeric" id="trf_perm3_R1" class="form-control" value="2.000" oninput="formatRibuanInput(this)"></td>
+                  <td><input type="text" inputmode="numeric" id="trf_psb_R1" class="form-control" value="750.000" oninput="formatRibuanInput(this)"></td>
+                </tr>
+                <tr>
+                  <td><strong>N-1</strong> <small style="color: var(--text-muted);">(Niaga / Usaha)</small></td>
+                  <td><input type="text" inputmode="numeric" id="trf_beban_N1" class="form-control" value="10.000" oninput="formatRibuanInput(this)"></td>
+                  <td><input type="text" inputmode="numeric" id="trf_perm3_N1" class="form-control" value="3.500" oninput="formatRibuanInput(this)"></td>
+                  <td><input type="text" inputmode="numeric" id="trf_psb_N1" class="form-control" value="1.250.000" oninput="formatRibuanInput(this)"></td>
+                </tr>
+                <tr>
+                  <td><strong>S-1</strong> <small style="color: var(--text-muted);">(Sosial / Ibadah)</small></td>
+                  <td><input type="text" inputmode="numeric" id="trf_beban_S1" class="form-control" value="2.000" oninput="formatRibuanInput(this)"></td>
+                  <td><input type="text" inputmode="numeric" id="trf_perm3_S1" class="form-control" value="1.000" oninput="formatRibuanInput(this)"></td>
+                  <td><input type="text" inputmode="numeric" id="trf_psb_S1" class="form-control" value="500.000" oninput="formatRibuanInput(this)"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 style="font-size: 14px; color: var(--primary); margin: 18px 0 10px; font-weight: 700;">Pengaturan Metode Pembayaran Loket</h3>
+          <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 12px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600;">
+              <input type="checkbox" id="setAktifTransfer" checked>
+              <span>Aktifkan Pembayaran Transfer Bank</span>
+            </label>
+            <div style="margin-top: 8px;">
+              <input type="text" id="setInfoRekening" class="form-control" placeholder="Contoh: Bank BRI: 0123-01-004567-53-8 a/n PAMSIMAS" value="Bank BRI: 0123-01-004567-53-8 (PAMSIMAS SAUYUNAN)">
+            </div>
+          </div>
+
+          <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600;">
+              <input type="checkbox" id="setAktifQris" checked>
+              <span>Aktifkan Pembayaran QRIS Statis</span>
+            </label>
+            <div style="margin-top: 8px;">
+              <input type="text" id="setInfoQris" class="form-control" placeholder="NMID / Keterangan QRIS" value="NMID: ID1020030040050 - PAMSIMAS SAUYUNAN">
+            </div>
+            
+            <div style="margin-top: 10px;">
+              <label class="form-label">Upload Gambar Barcode QRIS Statis</label>
+              <input type="file" id="inputUploadGambarQris" class="form-control" accept="image/*" onchange="handleUploadGambarQris(event)">
+              <input type="hidden" id="setGambarQris" value="">
+              <div id="wrapPreviewQris" style="display: none; margin-top: 8px; align-items: center; gap: 12px;">
+                <img id="previewGambarQris" src="" style="width: 70px; height: 70px; object-fit: contain; background: #fff; padding: 3px; border-radius: 6px; border: 1px solid var(--border-color);" alt="Preview QRIS">
+                <button type="button" class="btn btn-danger btn-sm" onclick="hapusGambarQris()"><i class="fa-solid fa-trash"></i> Hapus Gambar</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1538,42 +1555,99 @@
     </main>
   </div>
 
-  <!-- MODAL KASIR / BAYAR TAGIHAN -->
   <div class="modal-overlay" id="modalKasir">
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title"><i class="fa-solid fa-cash-register" style="color: var(--primary);"></i> Pembayaran Rekening Air</div>
         <button class="modal-close" onclick="closeModal('modalKasir')">&times;</button>
       </div>
-      <div id="detailKasirPelanggan" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 14px; font-size: 13px;">
-        <!-- Rincian diisi JS -->
+      
+      <div id="boxNotaKasirPutih" style="background: #ffffff !important; color: #0f172a !important; padding: 16px; border-radius: var(--radius-md); margin-bottom: 14px; font-size: 13px; border: 1px solid #cbd5e1; font-family: var(--font-mono); line-height: 1.45; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <div class="receipt-row" style="color: #1e293b; margin-bottom: 4px;"><span>No. Tagihan:</span><strong id="kasirNotaNoTagihan" style="color: #047857; font-weight: 800;">-</strong></div>
+        <div class="receipt-row" style="color: #1e293b; margin-bottom: 4px;"><span>ID Pelanggan:</span><span id="kasirNotaIdPelanggan" style="font-weight: 600;">-</span></div>
+        <div class="receipt-row" style="color: #1e293b; margin-bottom: 4px;"><span>Nama Warga:</span><strong id="kasirNotaNamaWarga" style="color: #0f172a;">-</strong></div>
+        <div class="receipt-row" style="color: #1e293b; margin-bottom: 4px;"><span>Periode Rekening:</span><span id="kasirNotaPeriode" style="font-weight: 600;">-</span></div>
+        <div class="receipt-row" style="color: #1e293b; margin-bottom: 4px;"><span>Stand Meter:</span><span id="kasirNotaStandMeter" style="font-weight: 600;">-</span></div>
+        <div class="receipt-row" style="color: #1e293b; margin-bottom: 4px;"><span>Total Pemakaian:</span><strong id="kasirNotaPemakaian" style="color: #0f172a;">-</strong></div>
+        
+        <div style="border-top: 1px dashed #94a3b8; margin: 10px 0;"></div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: baseline; color: #0f172a; margin-bottom: 2px;">
+          <span style="font-weight: 700;">Biaya Air (Tarif x Pakai):</span>
+          <strong id="kasirNotaBiayaAir" style="font-size: 14px; color: #0f172a;">Rp 0</strong>
+        </div>
+        <div id="kasirNotaBiayaAirSub" style="text-align: right; font-size: 11px; color: #475569; margin-bottom: 6px; font-weight: 600;">
+          (Rp 0 × 0 m³)
+        </div>
+
+        <div class="receipt-row" style="color: #1e293b; margin-bottom: 4px;"><span>Beban Abonemen:</span><span id="kasirNotaBeban" style="font-weight: 600;">Rp 0</span></div>
+        <div class="receipt-row" id="rowKasirNotaDenda" style="display: none; color: #dc2626; margin-bottom: 4px;">
+          <span>Denda Terlambat:</span><span id="kasirNotaDenda" style="font-weight: 700;">Rp 0</span>
+        </div>
+        
+        <div class="receipt-row" style="align-items: center; margin-top: 6px; color: #0f172a;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #0f172a; font-weight: 700;">
+            <input type="checkbox" id="kasirCentangAdmin" checked onchange="updateKalkulatorKasir()">
+            <span>Biaya Admin Loket (+Rp 3.000)</span>
+          </label>
+        </div>
+        
+        <div style="border-top: 1px dashed #94a3b8; margin: 10px 0;"></div>
+        
+        <div class="receipt-total-row" style="margin: 0; padding: 6px 0; border-top: 1px dashed #94a3b8; border-bottom: 1px dashed #94a3b8; color: #047857; display: flex; justify-content: space-between; font-size: 15px; font-weight: 800;">
+          <span>TOTAL PEMBAYARAN:</span>
+          <span id="kasirNotaTotalTagihan">Rp 0</span>
+        </div>
       </div>
+
       <form onsubmit="event.preventDefault(); prosesDanTinjauTagihan();">
         <input type="hidden" id="kasirIdTagihan">
+        <input type="hidden" id="kasirMetodeBayar" value="Tunai">
+
         <div class="form-group">
           <label class="form-label">Metode Pembayaran</label>
-          <select id="kasirMetodeBayar" class="form-control" onchange="updateKalkulatorKasir()">
-            <option value="Tunai">Tunai (Cash Loket)</option>
-            <option value="Transfer">Transfer Rekening Bank</option>
-            <option value="QRIS">QRIS Statis Desa</option>
-          </select>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;" id="wrapTabMetodeKasir">
+            <button type="button" id="tabBayarTunai" class="btn btn-secondary" onclick="pilihMetodeBayarKasir('Tunai')" style="width: 100%; border-color: var(--primary); color: var(--primary); background: var(--primary-glow); font-weight: 700;">
+              <i class="fa-solid fa-money-bill-wave"></i> Tunai
+            </button>
+            <button type="button" id="tabBayarTransfer" class="btn btn-secondary" onclick="pilihMetodeBayarKasir('Transfer')" style="width: 100%;">
+              <i class="fa-solid fa-building-columns"></i> Transfer
+            </button>
+            <button type="button" id="tabBayarQris" class="btn btn-secondary" onclick="pilihMetodeBayarKasir('QRIS')" style="width: 100%;">
+              <i class="fa-solid fa-qrcode"></i> QRIS
+            </button>
+          </div>
         </div>
+
+        <div id="boxKasirInfoTransfer" style="display: none; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 12px; font-size: 12px;">
+          <div>Silakan transfer ke rekening resmi:</div>
+          <strong id="kasirTeksRekeningBank" style="font-size: 13px; color: #38bdf8; display: block; margin: 4px 0;">Bank BRI: 0123-01-004567-53-8 (PAMSIMAS SAUYUNAN)</strong>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="salinRekeningBank()" style="margin-top: 4px;"><i class="fa-solid fa-copy"></i> Salin Nomor Rekening</button>
+        </div>
+
+        <div id="boxKasirInfoQris" style="display: none; background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.3); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 12px; font-size: 12px; text-align: center;">
+          <div style="font-weight: 700; color: var(--primary); margin-bottom: 4px;">Pindai QRIS Statis Loket</div>
+          <div id="kasirTeksNmidQris" style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">NMID: ID1020030040050 - PAMSIMAS SAUYUNAN</div>
+          <div id="wrapImgQrisKasir" style="display: none; margin: 8px auto; text-align: center;">
+            <img id="imgQrisKasir" src="" style="max-width: 180px; max-height: 180px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" alt="QRIS PAMSIMAS">
+          </div>
+        </div>
+
         <div class="form-group" id="wrapKasirUangDiterima">
           <label class="form-label">Jumlah Uang Diterima (Rp)</label>
-          <input type="number" id="kasirUangDiterima" class="form-control" placeholder="0" oninput="updateKalkulatorKasir()">
+          <input type="text" inputmode="numeric" id="kasirUangDiterima" class="form-control" placeholder="0" oninput="updateKalkulatorKasir()">
         </div>
-        <div class="receipt-row bold" style="font-size: 14px; margin-top: 10px; color: var(--text-main);">
+        <div class="receipt-row" style="font-size: 14px; margin-top: 10px; font-weight: 700; color: var(--text-main);">
           <span>Uang Kembalian:</span>
-          <span id="kasirUangKembalian" style="color: var(--primary);">Rp 0</span>
+          <span id="kasirUangKembalian" style="color: var(--primary);">Rp 0 (Pas)</span>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px; padding: 12px;">
-          <i class="fa-solid fa-receipt"></i> Proses & Tinjau Kuitansi
+          <i class="fa-solid fa-receipt"></i> Proses & Tinjau Kuitansi Tagihan
         </button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL STRUK KUITANSI (Paper White Receipt) -->
   <div class="modal-overlay" id="modalStruk">
     <div class="modal-content" style="max-width: 440px;">
       <div class="modal-header">
@@ -1581,7 +1655,6 @@
         <button class="modal-close" onclick="closeModal('modalStruk')">&times;</button>
       </div>
       
-      <!-- AREA CETAK STRUK PUTIH -->
       <div id="areaCetakThermal">
         <div class="receipt-box" id="boxStrukKuitansi">
           <div class="receipt-header">
@@ -1597,20 +1670,41 @@
           <div class="receipt-divider"></div>
           <div class="receipt-row"><span>Meter Lalu - Kini:</span><span id="strukMeterLaluKini">-</span></div>
           <div class="receipt-row"><span>Pemakaian Air:</span><strong id="strukPakaiM3">-</strong></div>
-          <div class="receipt-row"><span>Biaya Air (Tarif × m³):</span><span id="strukBiayaAir">-</span></div>
+          
+          <div class="receipt-row" style="margin-bottom: 2px;">
+            <span>Biaya Air (Tarif x Pakai):</span>
+            <span id="strukBiayaAir" style="font-weight: 600;">Rp 0</span>
+          </div>
+          <div id="strukBiayaAirSub" style="text-align: right; font-size: 11px; color: #475569; margin-bottom: 6px;">
+            (Rp 0 × 0 m³)
+          </div>
+
           <div class="receipt-row"><span>Beban Abonemen:</span><span id="strukBeban">-</span></div>
-          <div class="receipt-row"><span>Biaya Admin Loket:</span><span id="strukAdmin">-</span></div>
-          <div class="receipt-row" id="rowStrukDenda" style="display: none; color: #dc2626;"><span>Denda Terlambat:</span><span id="strukDenda">Rp 0</span></div>
-          <div class="receipt-total-row"><span>TOTAL TAGIHAN:</span><span id="strukTotalTagihan">Rp 0</span></div>
-          <div class="receipt-row" id="rowStrukDibayar"><span>Jumlah Dibayar:</span><strong id="strukDibayar">Rp 0</strong></div>
-          <div class="receipt-row" id="rowStrukKembalian"><span>Uang Kembalian:</span><strong id="strukKembalian">Rp 0</strong></div>
-          <div class="receipt-row"><span>Metode Bayar:</span><span id="strukMetodeBayar">Tunai</span></div>
-          <div class="receipt-row"><span>Kasir Melayani:</span><span id="strukKasir">Admin</span></div>
-          <div class="receipt-badge-status" id="strukBadgeStatus">LUNAS</div>
+          <div class="receipt-row" id="rowStrukAdmin"><span>Biaya Admin Loket:</span><span id="strukAdmin">-</span></div>
+          <div class="receipt-row" id="rowStrukDenda" style="display: none; color: #dc2626;"><span>Denda Terlambat:</span><span id="strukDenda">-</span></div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-total-row" style="margin: 8px 0; padding: 6px 0; border-top: 1px dashed #94a3b8; border-bottom: 1px dashed #94a3b8; display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; color: #047857;">
+            <span>TOTAL BAYAR:</span>
+            <span id="strukTotalTagihan">Rp 0</span>
+          </div>
+
+          <div class="receipt-row" id="rowStrukUangDibayar"><span>Jumlah Dibayar:</span><span id="strukDibayar" style="font-weight: 600;">Rp 0</span></div>
+          <div class="receipt-row" id="rowStrukKembalian"><span>Uang Kembalian:</span><span id="strukKembalian" style="font-weight: 600;">Rp 0</span></div>
+          <div class="receipt-row"><span>Metode Bayar:</span><span id="strukMetodeBayar">-</span></div>
+          <div class="receipt-row"><span>Kasir Melayani:</span><span id="strukKasir">-</span></div>
+
+          <div class="receipt-badge-status lunas" id="strukBadgeStatus" style="text-align: center; padding: 6px; font-weight: 800; font-size: 12px; border-radius: 4px; margin-top: 10px;">
+            LUNAS (PEMBAYARAN SAH)
+          </div>
+
+          <div style="text-align: center; font-size: 10.5px; color: #64748b; margin-top: 10px;">
+            Simpan struk kuitansi ini sebagai bukti transaksi resmi.
+          </div>
         </div>
       </div>
 
-      <!-- TOMBOL AKSI KUITANSI -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;">
         <button class="btn btn-primary" onclick="kirimCetakThermalBluetooth()"><i class="fa-solid fa-print"></i> Cetak Bluetooth</button>
         <button class="btn btn-secondary" onclick="fallbackCetakThermalSpooler()"><i class="fa-solid fa-file-pdf"></i> Cetak Browser</button>
@@ -1627,7 +1721,6 @@
     </div>
   </div>
 
-  <!-- MODAL FORM TAMBAH / EDIT PELANGGAN -->
   <div class="modal-overlay" id="modalFormPelanggan">
     <div class="modal-content">
       <div class="modal-header">
@@ -1666,7 +1759,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Stand Meter Awal (m³)</label>
-            <input type="number" id="formPelangganMeterAwal" class="form-control" value="0" required>
+            <input type="text" inputmode="numeric" id="formPelangganMeterAwal" class="form-control" value="0" required oninput="formatRibuanInput(this)">
           </div>
         </div>
         <div class="form-group">
@@ -1685,7 +1778,6 @@
     </div>
   </div>
 
-  <!-- MODAL FORM TAMBAH / EDIT PETUGAS -->
   <div class="modal-overlay" id="modalFormPetugas">
     <div class="modal-content">
       <div class="modal-header">
@@ -1741,7 +1833,179 @@
     </div>
   </div>
 
-  <!-- MODAL FORM ADUAN GANGGUAN -->
+  <div class="modal-overlay" id="modalFormPasangBaru">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-user-plus" style="color: var(--primary);"></i> Pendaftaran Pasang Baru (PSB)</div>
+        <button class="modal-close" onclick="closeModal('modalFormPasangBaru')">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitFormPasangBaru();">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap Pemohon</label>
+          <input type="text" id="psbNama" class="form-control" required placeholder="Contoh: Asep Saepudin">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">NIK (KTP)</label>
+            <input type="text" id="psbNik" class="form-control" placeholder="3211...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">No. WhatsApp Aktif</label>
+            <input type="text" id="psbNoHp" class="form-control" required placeholder="081234567890">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alamat Lengkap / Blok Pemasangan</label>
+          <input type="text" id="psbAlamat" class="form-control" required placeholder="Contoh: Dusun Ciakar RW 02">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">RT / RW</label>
+            <input type="text" id="psbRtRw" class="form-control" placeholder="RT 02 / RW 02">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Golongan Tarif</label>
+            <select id="psbGolongan" class="form-control" required>
+              <option value="R-1">R-1 (Rumah Tangga)</option>
+              <option value="N-1">N-1 (Niaga / Usaha)</option>
+              <option value="S-1">S-1 (Sosial / Ibadah)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan / Patokan Lokasi</label>
+          <input type="text" id="psbCatatan" class="form-control" placeholder="Contoh: Depan warung bu Hj. Siti">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 6px;">
+          <i class="fa-solid fa-paper-plane"></i> Kirim Permohonan Pemasangan
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalFormKas">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-wallet" style="color: var(--primary);"></i> Catat Mutasi Kas Umum</div>
+        <button class="modal-close" onclick="closeModal('modalFormKas')">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitFormKas();">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Jenis Kas</label>
+            <select id="kasJenis" class="form-control" required>
+              <option value="Masuk">Kas Masuk (+)</option>
+              <option value="Keluar">Kas Keluar (-)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nominal (Rp)</label>
+            <input type="text" inputmode="numeric" id="kasNominal" class="form-control" required placeholder="0" oninput="formatRibuanInput(this)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori Transaksi</label>
+          <input type="text" id="kasKategori" class="form-control" required placeholder="Contoh: Operasional Pipa / Pembelian Lem">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Keterangan / Rincian</label>
+          <textarea id="kasKeterangan" class="form-control" rows="3" required placeholder="Rincian peruntukan kas..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Transaksi Kas
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalFormMaterial">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-boxes-stacked" style="color: var(--primary);"></i> Tambah Material Inventaris</div>
+        <button class="modal-close" onclick="closeModal('modalFormMaterial')">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitFormMaterial();">
+        <div class="form-group">
+          <label class="form-label">Nama Material / Barang</label>
+          <input type="text" id="matNama" class="form-control" required placeholder="Contoh: Water Meter SNI 1/2 Inch">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Satuan</label>
+            <select id="matSatuan" class="form-control" required>
+              <option value="Unit">Unit</option>
+              <option value="Batang">Batang</option>
+              <option value="Pcs">Pcs</option>
+              <option value="Roll">Roll</option>
+              <option value="Dus">Dus</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jumlah Stok Awal</label>
+            <input type="text" inputmode="numeric" id="matStok" class="form-control" value="1" required oninput="formatRibuanInput(this)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Harga Satuan (Rp)</label>
+          <input type="text" inputmode="numeric" id="matHarga" class="form-control" value="0" required oninput="formatRibuanInput(this)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Keterangan Spesifikasi</label>
+          <input type="text" id="matKeterangan" class="form-control" placeholder="Contoh: Merk Rucika / Onda">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+          <i class="fa-solid fa-save"></i> Daftarkan Material Baru
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalFormNrw">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="titleModalNrw"><i class="fa-solid fa-droplet-slash" style="color: var(--primary);"></i> Catat Meter Induk Tandon (NRW)</div>
+        <button class="modal-close" onclick="closeModal('modalFormNrw')">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitFormNrw();">
+        <input type="hidden" id="nrwIsEdit" value="0">
+        <input type="hidden" id="nrwIdNrw" value="">
+        <div class="form-group">
+          <label class="form-label">Periode Rekening</label>
+          <input type="text" id="nrwPeriode" class="form-control" required placeholder="Contoh: 09/2026">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Meter Awal Tandon (m³)</label>
+            <input type="text" inputmode="numeric" id="nrwMeterAwal" class="form-control" required placeholder="0" oninput="formatRibuanInput(this)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Meter Akhir Tandon (m³)</label>
+            <input type="text" inputmode="numeric" id="nrwMeterAkhir" class="form-control" required placeholder="0" oninput="formatRibuanInput(this)">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+          <i class="fa-solid fa-calculator"></i> Simpan & Kalkulasi Kehilangan Air
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalScanQr">
+    <div class="modal-content" style="max-width: 440px; text-align: center;">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-camera" style="color: var(--primary);"></i> Pindai Barcode QR Pelanggan</div>
+        <button class="modal-close" onclick="tutupScanQrMeter()">&times;</button>
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+        Arahkan kamera HP ke kartu pelanggan PAMSIMAS untuk memilih otomatis.
+      </div>
+      <div id="readerQrScan" style="width: 100%; min-height: 250px; background: #000; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 12px;"></div>
+      <button class="btn btn-secondary" style="width: 100%;" onclick="tutupScanQrMeter()">
+        <i class="fa-solid fa-xmark"></i> Tutup Kamera Pemindai
+      </button>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalFormAduan">
     <div class="modal-content">
       <div class="modal-header">
@@ -1776,7 +2040,43 @@
     </div>
   </div>
 
-  <!-- MODAL PENGATURAN BLUETOOTH PRINTER -->
+  <div class="modal-overlay" id="modalPakaiMaterialAduan">
+    <div class="modal-content" style="max-width: 460px;">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa-solid fa-toolbox" style="color: var(--primary);"></i> Catat Material Terpakai</div>
+        <button class="modal-close" onclick="closeModal('modalPakaiMaterialAduan')">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitMaterialAduan();">
+        <input type="hidden" id="aduanPakaiIdTiket">
+        <div class="form-group">
+          <label class="form-label">No. Tiket Aduan</label>
+          <input type="text" id="aduanPakaiLabelTiket" class="form-control" readonly style="background: rgba(255,255,255,0.03); font-weight: 700; color: var(--primary);">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pilih Material Logistik</label>
+          <select id="aduanPakaiKodeBarang" class="form-control" required onchange="updateInfoStokMaterialAduan()">
+            <option value="">-- Memuat material gudang... --</option>
+          </select>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 12px; background: rgba(0, 255, 170, 0.05); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(0, 255, 170, 0.2);">
+          <span>Sisa Stok Tersedia:</span>
+          <strong id="aduanPakaiSisaStok" style="color: var(--primary); font-family: var(--font-mono);">-</strong>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jumlah Material Digunakan</label>
+          <input type="text" inputmode="numeric" id="aduanPakaiQty" class="form-control" value="1" required placeholder="0" oninput="formatRibuanInput(this)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan Penggunaan (Opsional)</label>
+          <input type="text" id="aduanPakaiCatatan" class="form-control" placeholder="Contoh: Klem pipa bocor depan rumah warga">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 6px;">
+          <i class="fa-solid fa-boxes-stacked"></i> Simpan & Potong Stok Gudang
+        </button>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalBluetoothPrinter">
     <div class="modal-content" style="max-width: 440px;">
       <div class="modal-header">
@@ -1812,21 +2112,61 @@
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
   <div id="toastBox" class="toast-box"></div>
 
   <script>
-    /* ====================================================================
-     * KONFIGURASI HYBRID DUAL-MODE API GATEWAY
-     * Berjalan otomatis di Google Apps Script (Internal) & Vercel (Cloud REST API)
-     * ==================================================================== */
     const BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbzVex78pnEKM4zu8KvFr3_ImM7GSQ1XqKAT3iGHlg0_jpR9EtTgpgtipXuQEHhyW65V/exec";
 
     let currentUser = null;
     let rawTagihanList = [];
     let rawPelangganList = [];
+    let rawPetugasList = [];
+    let rawNrwList = [];
+    let selectedTagihanForPay = null;
+    let activeStrukData = null;
+    let cachedAppSettings = null;
+    let nominalAdminSetting = 3000;
+    let btDevice = null;
+    let btCharacteristic = null;
+    let qrScannerInstance = null;
+    let deferredPrompt = null;
 
-    // Fungsi Bridge Pemanggil Server Universal
+    function formatRibuanInput(el) {
+      if (!el) return;
+      var raw = el.value ? el.value.toString().replace(/\D/g, '') : '';
+      el.value = (raw === '') ? '' : parseInt(raw, 10).toLocaleString('id-ID');
+    }
+
+    function parseRibuan(val) {
+      if (val === null || typeof val === 'undefined') return 0;
+      var clean = val.toString().replace(/\./g, '').replace(/,/g, '.').replace(/[^\d.-]/g, '');
+      return parseFloat(clean) || 0;
+    }
+
+    function formatRupiah(num) {
+      return "Rp " + (parseFloat(num) || 0).toLocaleString("id-ID");
+    }
+
+    function formatNamaPeriode(periodeStr) {
+      if (!periodeStr || periodeStr.indexOf('/') === -1) return periodeStr || "-";
+      var parts = periodeStr.split('/');
+      var mm = parseInt(parts[0], 10);
+      var yyyy = parts[1];
+      var bulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      return (bulan[mm] || mm) + "/ " + yyyy;
+    }
+
+    function getCurrentDateTimeString() {
+      var d = new Date();
+      var dd = ('0' + d.getDate()).slice(-2);
+      var mm = ('0' + (d.getMonth() + 1)).slice(-2);
+      var yyyy = d.getFullYear();
+      var hh = ('0' + d.getHours()).slice(-2);
+      var min = ('0' + d.getMinutes()).slice(-2);
+      var ss = ('0' + d.getSeconds()).slice(-2);
+      return dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + min + ':' + ss;
+    }
+
     function callBackend(functionName, paramsArray, onSuccess, onError) {
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
@@ -1853,8 +2193,6 @@
         return;
       }
 
-      // Mock Fallback jika tanpa backend
-      console.warn("Backend tidak tersedia. Menggunakan mode demo offline.");
       onSuccess({ success: false, message: "Backend URL belum dikonfigurasi!" });
     }
 
@@ -1867,15 +2205,15 @@
         if (res.success) {
           text.innerText = "Database Terhubung";
           badge.style.color = "var(--primary)";
-          showToast("Koneksi database Google Sheets aktif dan lancar!", "success");
+          showToast("Koneksi Google Sheets aktif!", "success");
         } else {
           text.innerText = "Mode Cadangan";
           badge.style.color = "var(--warning)";
         }
-      }, function(err) {
+      }, function() {
         text.innerText = "Offline";
         badge.style.color = "var(--danger)";
-        showToast("Gagal terhubung ke database cloud!", "error");
+        showToast("Gagal terhubung ke database!", "error");
       });
     }
 
@@ -1933,7 +2271,6 @@
       document.getElementById('navUserRole').innerText = currentUser.role;
       document.getElementById('navUserAvatar').innerText = currentUser.nama.charAt(0).toUpperCase();
 
-      // Sembunyikan menu kantor jika login sebagai warga
       var isPelanggan = (currentUser.role === 'Pelanggan');
       var ids = ['menuItemPelanggan', 'menuItemCatatMeter', 'menuItemPasangBaru', 'menuItemBukuKas', 'menuItemInventaris', 'menuItemNrw', 'menuItemPetugas', 'menuItemPengaturan'];
       ids.forEach(function(id) {
@@ -1945,10 +2282,12 @@
     }
 
     function toggleSidebar() {
-      var drawer = document.getElementById('sidebarDrawer');
-      var backdrop = document.getElementById('sidebarBackdrop');
-      drawer.classList.toggle('open');
-      backdrop.classList.toggle('active');
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebarDrawer').classList.toggle('open');
+        document.getElementById('sidebarBackdrop').classList.toggle('active');
+      } else {
+        document.body.classList.toggle('sidebar-collapsed');
+      }
     }
 
     function closeSidebar() {
@@ -2007,7 +2346,7 @@
       callBackend("getDashboardMetrics", [role, uname, idPel], function(res) {
         if (res.success) {
           var d = res.data;
-          document.getElementById('dashTotalPelanggan').innerText = d.totalPelanggan || 0;
+          document.getElementById('dashTotalPelanggan').innerText = (parseFloat(d.totalPelanggan) || 0).toLocaleString('id-ID');
           document.getElementById('dashTagihanBelumLunas').innerText = formatRupiah(d.totalTagihanBelumLunas || 0);
           document.getElementById('dashKasLunas').innerText = formatRupiah(d.totalKasLunas || 0);
           document.getElementById('dashSaldoKas').innerText = formatRupiah(d.saldoKasTerakhir || 0);
@@ -2023,7 +2362,7 @@
       var kw = document.getElementById('cariTagihanKeyword').value.trim();
 
       var tbody = document.getElementById('tbodyTagihan');
-      tbody.innerHTML = '<tr><td colspan="13" style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data rekening tagihan...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="13" style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat rekening tagihan...</td></tr>';
 
       callBackend("getTagihanList", [status, role, idPel, kw], function(res) {
         if (res.success) {
@@ -2047,16 +2386,16 @@
         var badgeStatus = it.status === 'Lunas' ? '<span class="badge badge-success">Lunas</span>' : '<span class="badge badge-danger">Belum Lunas</span>';
         var btnAksi = (it.status === 'Lunas')
           ? '<button class="btn btn-secondary btn-sm" onclick="bukaStrukKuitansi(\'' + it.idTagihan + '\')"><i class="fa-solid fa-receipt"></i> Kuitansi</button>'
-          : '<button class="btn btn-primary btn-sm" onclick="bukaModalKasir(\'' + it.idTagihan + '\')"><i class="fa-solid fa-cash-register"></i> Bayar</button>';
+          : '<button class="btn btn-primary btn-sm" onclick="bukaModalKasir(\'' + it.idTagihan + '\')"><i class="fa-solid fa-cash-register"></i> Cek Tagihan</button>';
 
         html += '<tr>' +
           '<td style="font-weight: 700; color: var(--primary); font-family: monospace;">' + it.idTagihan + '</td>' +
           '<td style="font-family: monospace;">' + it.idPelanggan + '</td>' +
           '<td style="font-weight: 600;">' + it.namaPelanggan + '</td>' +
           '<td>' + formatNamaPeriode(it.periode) + '</td>' +
-          '<td>' + it.meterLalu + ' m³</td>' +
-          '<td>' + it.meterKini + ' m³</td>' +
-          '<td style="font-weight: 700;">' + it.pemakaianM3 + ' m³</td>' +
+          '<td>' + (parseFloat(it.meterLalu) || 0).toLocaleString('id-ID') + ' m³</td>' +
+          '<td>' + (parseFloat(it.meterKini) || 0).toLocaleString('id-ID') + ' m³</td>' +
+          '<td style="font-weight: 700;">' + (parseFloat(it.pemakaianM3) || 0).toLocaleString('id-ID') + ' m³</td>' +
           '<td>' + formatRupiah(it.biayaAir) + ' <small style="color: var(--text-muted);">(' + formatRupiah(it.tarifPerM3) + '×' + it.pemakaianM3 + ')</small></td>' +
           '<td>' + formatRupiah(it.biayaBeban) + '</td>' +
           '<td style="color: ' + (it.denda > 0 ? 'var(--danger)' : 'inherit') + ';">' + formatRupiah(it.denda) + '</td>' +
@@ -2079,71 +2418,186 @@
       renderTableTagihan(filtered);
     }
 
-    let selectedTagihanForPay = null;
-
     function bukaModalKasir(idTagihan) {
       selectedTagihanForPay = rawTagihanList.find(function(t) { return t.idTagihan === idTagihan; });
       if (!selectedTagihanForPay) return;
 
-      document.getElementById('kasirIdTagihan').value = selectedTagihanForPay.idTagihan;
-      document.getElementById('kasirMetodeBayar').value = "Tunai";
-      document.getElementById('kasirUangDiterima').value = selectedTagihanForPay.totalTagihan;
+      var it = selectedTagihanForPay;
+      document.getElementById('kasirIdTagihan').value = it.idTagihan;
+      document.getElementById('kasirNotaNoTagihan').innerText = it.idTagihan;
+      document.getElementById('kasirNotaIdPelanggan').innerText = it.idPelanggan;
+      document.getElementById('kasirNotaNamaWarga').innerText = it.namaPelanggan;
+      document.getElementById('kasirNotaPeriode').innerText = formatNamaPeriode(it.periode);
+      document.getElementById('kasirNotaStandMeter').innerText = (parseFloat(it.meterLalu) || 0).toLocaleString('id-ID') + " → " + (parseFloat(it.meterKini) || 0).toLocaleString('id-ID') + " m³";
+      document.getElementById('kasirNotaPemakaian').innerText = (parseFloat(it.pemakaianM3) || 0).toLocaleString('id-ID') + " m³";
+      
+      var pemakaian = parseFloat(it.pemakaianM3) || 0;
+      var biayaAir = parseFloat(it.biayaAir) || 0;
+      var ratePerM3 = it.tarifPerM3 || (pemakaian > 0 ? Math.round(biayaAir / pemakaian) : 4000);
+      
+      document.getElementById('kasirNotaBiayaAir').innerText = formatRupiah(biayaAir);
+      var subKasirEl = document.getElementById('kasirNotaBiayaAirSub');
+      if (subKasirEl) {
+        subKasirEl.innerText = "(" + formatRupiah(ratePerM3) + " × " + pemakaian.toLocaleString('id-ID') + " m³)";
+      }
 
-      var infoHtml = '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">' +
-        '<span>Pelanggan: <strong>' + selectedTagihanForPay.namaPelanggan + '</strong> (' + selectedTagihanForPay.idPelanggan + ')</span>' +
-        '<span>Periode: <strong>' + formatNamaPeriode(selectedTagihanForPay.periode) + '</strong></span>' +
-      '</div>' +
-      '<div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 15px;">' +
-        '<span>Total Tagihan:</span>' +
-        '<strong style="color: var(--primary); font-size: 17px;">' + formatRupiah(selectedTagihanForPay.totalTagihan) + '</strong>' +
-      '</div>';
+      document.getElementById('kasirNotaBeban').innerText = formatRupiah(it.biayaBeban);
 
-      document.getElementById('detailKasirPelanggan').innerHTML = infoHtml;
+      var rowDenda = document.getElementById('rowKasirNotaDenda');
+      if (it.denda > 0) {
+        rowDenda.style.display = 'flex';
+        document.getElementById('kasirNotaDenda').innerText = formatRupiah(it.denda);
+      } else {
+        rowDenda.style.display = 'none';
+      }
+
+      document.getElementById('kasirCentangAdmin').checked = true;
+
+      var aktifTf = true;
+      var aktifQris = true;
+      if (cachedAppSettings) {
+        aktifTf = (cachedAppSettings.aktif_transfer !== "Tidak");
+        aktifQris = (cachedAppSettings.aktif_qris !== "Tidak");
+      }
+
+      var tabTfEl = document.getElementById('tabBayarTransfer');
+      var tabQrisEl = document.getElementById('tabBayarQris');
+      if (tabTfEl) tabTfEl.style.display = aktifTf ? 'block' : 'none';
+      if (tabQrisEl) tabQrisEl.style.display = aktifQris ? 'block' : 'none';
+
+      var imgQrisEl = document.getElementById('imgQrisKasir');
+      var wrapImgQris = document.getElementById('wrapImgQrisKasir');
+      var gambarQrisVal = (cachedAppSettings && cachedAppSettings.gambar_qris) ? cachedAppSettings.gambar_qris : (document.getElementById('setGambarQris') ? document.getElementById('setGambarQris').value : '');
+      if (imgQrisEl && wrapImgQris) {
+        if (gambarQrisVal && gambarQrisVal.trim() !== "") {
+          imgQrisEl.src = gambarQrisVal;
+          wrapImgQris.style.display = 'block';
+        } else {
+          wrapImgQris.style.display = 'none';
+        }
+      }
+
+      pilihMetodeBayarKasir('Tunai');
+
+      var totalAwal = hitungTotalTagihanAktual();
+      document.getElementById('kasirUangDiterima').value = totalAwal.toLocaleString('id-ID');
       updateKalkulatorKasir();
+
       document.getElementById('modalKasir').classList.add('active');
+    }
+
+    function pilihMetodeBayarKasir(metode) {
+      document.getElementById('kasirMetodeBayar').value = metode;
+      var tabs = [
+        { id: 'tabBayarTunai', val: 'Tunai' },
+        { id: 'tabBayarTransfer', val: 'Transfer' },
+        { id: 'tabBayarQris', val: 'QRIS' }
+      ];
+
+      tabs.forEach(function(t) {
+        var btn = document.getElementById(t.id);
+        if (!btn) return;
+        if (t.val === metode) {
+          btn.style.borderColor = 'var(--primary)';
+          btn.style.color = 'var(--primary)';
+          btn.style.background = 'var(--primary-glow)';
+          btn.style.fontWeight = '700';
+        } else {
+          btn.style.borderColor = 'var(--border-color)';
+          btn.style.color = 'var(--text-main)';
+          btn.style.background = 'var(--bg-input)';
+          btn.style.fontWeight = '500';
+        }
+      });
+
+      var boxTf = document.getElementById('boxKasirInfoTransfer');
+      var boxQris = document.getElementById('boxKasirInfoQris');
+      var wrapCash = document.getElementById('wrapKasirUangDiterima');
+
+      if (boxTf) boxTf.style.display = (metode === 'Transfer') ? 'block' : 'none';
+      if (boxQris) boxQris.style.display = (metode === 'QRIS') ? 'block' : 'none';
+      if (wrapCash) wrapCash.style.display = (metode !== 'Tunai') ? 'none' : 'block';
+
+      updateKalkulatorKasir();
+    }
+
+    function hitungTotalTagihanAktual() {
+      if (!selectedTagihanForPay) return 0;
+      var it = selectedTagihanForPay;
+      var biayaAir = parseFloat(it.biayaAir) || 0;
+      var beban = parseFloat(it.biayaBeban) || 0;
+      var denda = parseFloat(it.denda) || 0;
+      var pakaiAdmin = document.getElementById('kasirCentangAdmin').checked;
+      var biayaAdmin = pakaiAdmin ? nominalAdminSetting : 0;
+      return (biayaAir + beban + denda + biayaAdmin);
     }
 
     function updateKalkulatorKasir() {
       if (!selectedTagihanForPay) return;
-      var total = selectedTagihanForPay.totalTagihan;
+      var totalAktual = hitungTotalTagihanAktual();
+      document.getElementById('kasirNotaTotalTagihan').innerText = formatRupiah(totalAktual);
+
       var metode = document.getElementById('kasirMetodeBayar').value;
-      var wrapCash = document.getElementById('wrapKasirUangDiterima');
       var uangInput = document.getElementById('kasirUangDiterima');
+      var kembalianEl = document.getElementById('kasirUangKembalian');
 
       if (metode !== 'Tunai') {
-        wrapCash.style.display = 'none';
-        uangInput.value = total;
-        document.getElementById('kasirUangKembalian').innerText = 'Rp 0 (Pas)';
+        uangInput.value = totalAktual.toLocaleString('id-ID');
+        kembalianEl.innerText = 'Rp 0 (Pas)';
+        kembalianEl.style.color = 'var(--primary)';
         return;
       }
 
-      wrapCash.style.display = 'block';
-      var dibayar = parseFloat(uangInput.value) || 0;
-      var kembalian = dibayar - total;
-      var kembalianEl = document.getElementById('kasirUangKembalian');
+      var rawDigits = uangInput.value ? uangInput.value.toString().replace(/\D/g, '') : '';
+      if (rawDigits === '') {
+        uangInput.value = '';
+        kembalianEl.innerText = "Kurang " + formatRupiah(totalAktual);
+        kembalianEl.style.color = "var(--danger)";
+        return;
+      }
+
+      var dibayar = parseFloat(rawDigits) || 0;
+      uangInput.value = dibayar.toLocaleString('id-ID');
+      var kembalian = dibayar - totalAktual;
 
       if (kembalian < 0) {
         kembalianEl.innerText = "Kurang " + formatRupiah(Math.abs(kembalian));
         kembalianEl.style.color = "var(--danger)";
+      } else if (kembalian === 0) {
+        kembalianEl.innerText = "Rp 0 (Pas)";
+        kembalianEl.style.color = "var(--primary)";
       } else {
         kembalianEl.innerText = formatRupiah(kembalian);
         kembalianEl.style.color = "var(--primary)";
       }
     }
 
+    function salinRekeningBank() {
+      var teks = "012301004567538";
+      var el = document.createElement("textarea");
+      el.value = teks;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      showToast("Nomor rekening bank berhasil disalin!", "success");
+    }
+
     function prosesDanTinjauTagihan() {
       if (!selectedTagihanForPay) return;
-      var total = selectedTagihanForPay.totalTagihan;
+      var totalAktual = hitungTotalTagihanAktual();
       var metode = document.getElementById('kasirMetodeBayar').value;
-      var dibayar = parseFloat(document.getElementById('kasirUangDiterima').value) || 0;
+      var dibayar = parseRibuan(document.getElementById('kasirUangDiterima').value);
+      var pakaiAdmin = document.getElementById('kasirCentangAdmin').checked;
+      var biayaAdmin = pakaiAdmin ? nominalAdminSetting : 0;
 
-      if (metode === 'Tunai' && dibayar < total) {
+      if (metode === 'Tunai' && dibayar < totalAktual) {
         showToast("Nominal uang yang diterima kurang dari total tagihan!", "warning");
         return;
       }
 
       closeModal('modalKasir');
-      isiDataStrukKuitansi(selectedTagihanForPay, dibayar, dibayar - total, metode, false);
+      isiDataStrukKuitansi(selectedTagihanForPay, dibayar, Math.max(0, dibayar - totalAktual), metode, false, biayaAdmin, totalAktual);
       document.getElementById('wrapTombolKonfirmasiLunas').style.display = 'block';
       document.getElementById('modalStruk').classList.add('active');
     }
@@ -2151,55 +2605,89 @@
     function bukaStrukKuitansi(idTagihan) {
       var item = rawTagihanList.find(function(t) { return t.idTagihan === idTagihan; });
       if (!item) return;
-      isiDataStrukKuitansi(item, item.totalTagihan, 0, item.metodeBayar || "Tunai", true);
+      var biayaAdmin = 3000;
+      var total = (parseFloat(item.biayaAir) || 0) + (parseFloat(item.biayaBeban) || 0) + (parseFloat(item.denda) || 0) + biayaAdmin;
+      isiDataStrukKuitansi(item, total, 0, item.metodeBayar || "Tunai", true, biayaAdmin, total);
       document.getElementById('wrapTombolKonfirmasiLunas').style.display = 'none';
       document.getElementById('modalStruk').classList.add('active');
     }
 
-    let activeStrukData = null;
+    function isiDataStrukKuitansi(item, dibayar, kembalian, metode, isLunas, biayaAdmin, grandTotal) {
+      var adminFee = (typeof biayaAdmin !== 'undefined') ? biayaAdmin : 3000;
+      var totalFix = grandTotal || ((parseFloat(item.biayaAir) || 0) + (parseFloat(item.biayaBeban) || 0) + (parseFloat(item.denda) || 0) + adminFee);
 
-    function isiDataStrukKuitansi(item, dibayar, kembalian, metode, isLunas) {
       activeStrukData = {
         item: item,
         dibayar: dibayar,
         kembalian: Math.max(0, kembalian),
         metode: metode,
-        isLunas: isLunas
+        isLunas: isLunas,
+        biayaAdmin: adminFee,
+        totalTagihan: totalFix
       };
 
-      document.getElementById('strukTglBayar').innerText = item.tglBayar && item.tglBayar !== '-' ? item.tglBayar : getCurrentDateTimeString();
+      document.getElementById('strukTglBayar').innerText = (item.tglBayar && item.tglBayar !== '-') ? item.tglBayar : getCurrentDateTimeString();
       document.getElementById('strukNoTagihan').innerText = item.idTagihan;
       document.getElementById('strukIdPelanggan').innerText = item.idPelanggan;
       document.getElementById('strukNamaWarga').innerText = item.namaPelanggan;
       document.getElementById('strukPeriode').innerText = formatNamaPeriode(item.periode);
-      document.getElementById('strukMeterLaluKini').innerText = item.meterLalu + " -> " + item.meterKini + " m³";
-      document.getElementById('strukPakaiM3').innerText = item.pemakaianM3 + " m³";
-      document.getElementById('strukBiayaAir').innerText = formatRupiah(item.biayaAir) + " (" + formatRupiah(item.tarifPerM3) + "/m³)";
-      document.getElementById('strukBeban').innerText = formatRupiah(item.biayaBeban);
-      document.getElementById('strukAdmin').innerText = formatRupiah(3000);
+      document.getElementById('strukMeterLaluKini').innerText = (parseFloat(item.meterLalu) || 0).toLocaleString('id-ID') + " → " + (parseFloat(item.meterKini) || 0).toLocaleString('id-ID') + " m³";
+      document.getElementById('strukPakaiM3').innerText = (parseFloat(item.pemakaianM3) || 0).toLocaleString('id-ID') + " m³";
+      
+      var pemakaian = parseFloat(item.pemakaianM3) || 0;
+      var biayaAir = parseFloat(item.biayaAir) || 0;
+      var ratePerM3 = item.tarifPerM3 || (pemakaian > 0 ? Math.round(biayaAir / pemakaian) : 4000);
 
-      var dendaRow = document.getElementById('rowStrukDenda');
-      if (item.denda > 0) {
-        dendaRow.style.display = 'flex';
-        document.getElementById('strukDenda').innerText = formatRupiah(item.denda);
-      } else {
-        dendaRow.style.display = 'none';
+      document.getElementById('strukBiayaAir').innerText = formatRupiah(biayaAir);
+      var biayaAirSubEl = document.getElementById('strukBiayaAirSub');
+      if (biayaAirSubEl) {
+        biayaAirSubEl.innerText = "(" + formatRupiah(ratePerM3) + " × " + pemakaian.toLocaleString('id-ID') + " m³)";
+      }
+      
+      document.getElementById('strukBeban').innerText = formatRupiah(item.biayaBeban);
+      
+      var rowAdmin = document.getElementById('rowStrukAdmin');
+      if (rowAdmin) {
+        rowAdmin.style.display = (adminFee > 0) ? 'flex' : 'none';
+        document.getElementById('strukAdmin').innerText = formatRupiah(adminFee);
       }
 
-      document.getElementById('strukTotalTagihan').innerText = formatRupiah(item.totalTagihan);
+      var dendaRow = document.getElementById('rowStrukDenda');
+      if (dendaRow) {
+        dendaRow.style.display = (item.denda > 0) ? 'flex' : 'none';
+        document.getElementById('strukDenda').innerText = formatRupiah(item.denda);
+      }
+
+      document.getElementById('strukTotalTagihan').innerText = formatRupiah(totalFix);
       document.getElementById('strukDibayar').innerText = formatRupiah(dibayar);
       document.getElementById('strukKembalian').innerText = formatRupiah(Math.max(0, kembalian));
       document.getElementById('strukMetodeBayar').innerText = metode;
       document.getElementById('strukKasir').innerText = (currentUser ? currentUser.nama : "Kasir");
 
       var badge = document.getElementById('strukBadgeStatus');
-      if (isLunas) {
-        badge.innerText = "LUNAS (TERVERIFIKASI)";
-        badge.className = "receipt-badge-status lunas";
-      } else {
-        badge.innerText = "BELUM LUNAS (MENUNGGU PEMBAYARAN)";
-        badge.className = "receipt-badge-status belum";
+      if (badge) {
+        badge.innerText = isLunas ? "LUNAS (PEMBAYARAN SAH)" : "BELUM LUNAS (MENUNGGU PEMBAYARAN)";
+        badge.className = "receipt-badge-status " + (isLunas ? "lunas" : "belum");
       }
+    }
+
+    function unduhStrukGambar() {
+      var box = document.getElementById('boxStrukKuitansi');
+      if (!box || typeof html2canvas === 'undefined') {
+        window.print();
+        return;
+      }
+      showToast("Memproses gambar struk...", "info");
+      html2canvas(box, { scale: 2, backgroundColor: "#ffffff" }).then(function(canvas) {
+        var link = document.createElement('a');
+        var noTag = (activeStrukData && activeStrukData.item) ? activeStrukData.item.idTagihan : "struk";
+        link.download = "Kuitansi_" + noTag + ".png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        showToast("Struk berhasil disimpan!", "success");
+      }).catch(function() {
+        window.print();
+      });
     }
 
     function konfirmasiStatusLunas() {
@@ -2212,7 +2700,7 @@
         if (res.success) {
           showToast(res.message, "success");
           activeStrukData.isLunas = true;
-          document.getElementById('strukBadgeStatus').innerText = "LUNAS (TERVERIFIKASI)";
+          document.getElementById('strukBadgeStatus').innerText = "LUNAS (PEMBAYARAN SAH)";
           document.getElementById('strukBadgeStatus').className = "receipt-badge-status lunas";
           document.getElementById('wrapTombolKonfirmasiLunas').style.display = 'none';
           loadTagihanList();
@@ -2223,38 +2711,28 @@
       });
     }
 
-    function unduhStrukGambar() {
-      var box = document.getElementById('boxStrukKuitansi');
-      html2canvas(box, { backgroundColor: "#ffffff", scale: 2 }).then(function(canvas) {
-        var link = document.createElement('a');
-        link.download = "Struk_" + (activeStrukData ? activeStrukData.item.idTagihan : "Kuitansi") + ".png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-        showToast("Gambar struk kuitansi berhasil disimpan!", "success");
-      });
-    }
-
     function kirimWaStruk() {
       if (!activeStrukData) return;
       var it = activeStrukData.item;
       var cleanHp = (it.noHp || "").replace(/\D/g, '');
       if (cleanHp.startsWith('0')) cleanHp = '62' + cleanHp.slice(1);
 
-      var pesan = "*BUKTI PEMBAYARAN REKENING AIR PAMSIMAS*\n\n" +
+      var pesan = "*BUKTI " + (activeStrukData.isLunas ? "PELUNASAN" : "TAGIHAN") + " REKENING AIR PAMSIMAS*\n\n" +
         "Yth. *" + it.namaPelanggan + "* (" + it.idPelanggan + ")\n" +
-        "Berikut kuitansi pelunasan air bersih Anda:\n" +
+        "Berikut rincian rekening air bersih Anda:\n" +
         "• No. Tagihan: *" + it.idTagihan + "*\n" +
         "• Periode: *" + formatNamaPeriode(it.periode) + "*\n" +
-        "• Stand Meter: " + it.meterLalu + " -> " + it.meterKini + " m³ (" + it.pemakaianM3 + " m³)\n" +
+        "• Stand Meter: " + (parseFloat(it.meterLalu) || 0).toLocaleString('id-ID') + " → " + (parseFloat(it.meterKini) || 0).toLocaleString('id-ID') + " m³ (" + (parseFloat(it.pemakaianM3) || 0).toLocaleString('id-ID') + " m³)\n" +
         "• Biaya Air: " + formatRupiah(it.biayaAir) + "\n" +
         "• Beban Abonemen: " + formatRupiah(it.biayaBeban) + "\n" +
-        "• Biaya Admin: " + formatRupiah(3000) + "\n" +
-        "• *TOTAL TAGIHAN: " + formatRupiah(it.totalTagihan) + "*\n" +
+        (activeStrukData.biayaAdmin > 0 ? ("• Biaya Admin: " + formatRupiah(activeStrukData.biayaAdmin) + "\n") : "") +
+        (it.denda > 0 ? ("• Denda: " + formatRupiah(it.denda) + "\n") : "") +
+        "• *TOTAL TAGIHAN: " + formatRupiah(activeStrukData.totalTagihan) + "*\n" +
         "• Jumlah Dibayar: " + formatRupiah(activeStrukData.dibayar) + "\n" +
         "• Uang Kembalian: " + formatRupiah(activeStrukData.kembalian) + "\n" +
-        "• Status: *" + (activeStrukData.isLunas ? "LUNAS" : "BELUM LUNAS") + "*\n" +
+        "• Status: *" + (activeStrukData.isLunas ? "LUNAS (PEMBAYARAN SAH)" : "BELUM LUNAS") + "*\n" +
         "• Tanggal: " + getCurrentDateTimeString() + "\n\n" +
-        "Terima kasih telah membayar tepat waktu untuk kelancaran air bersih desa.";
+        (activeStrukData.isLunas ? "Terima kasih atas pembayaran tepat waktu Anda." : "Mohon segera melakukan pelunasan sebelum batas tanggal jatuh tempo.");
 
       var url = cleanHp ? ("https://api.whatsapp.com/send?phone=" + cleanHp + "&text=" + encodeURIComponent(pesan))
                         : ("https://api.whatsapp.com/send?text=" + encodeURIComponent(pesan));
@@ -2263,7 +2741,7 @@
 
     function loadPelangganList() {
       var tbody = document.getElementById('tbodyPelanggan');
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data warga pelanggan...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data warga...</td></tr>';
 
       callBackend("getPelangganList", [""], function(res) {
         if (res.success) {
@@ -2291,7 +2769,7 @@
           '<td>' + it.alamat + '</td>' +
           '<td>' + it.noHp + '</td>' +
           '<td><span class="badge badge-info">' + it.golongan + '</span></td>' +
-          '<td>' + it.meterAwal + ' m³</td>' +
+          '<td>' + (parseFloat(it.meterAwal) || 0).toLocaleString('id-ID') + ' m³</td>' +
           '<td><span class="badge ' + (it.status === 'Aktif' ? 'badge-success' : 'badge-danger') + '">' + it.status + '</span></td>' +
           '<td style="text-align: center; white-space: nowrap;">' +
             '<button class="btn btn-secondary btn-sm" onclick="editPelanggan(\'' + it.idPelanggan + '\')" title="Edit Data" style="margin-right: 4px;"><i class="fa-solid fa-pen-to-square"></i></button>' +
@@ -2317,13 +2795,11 @@
     function populatePelangganDropdowns() {
       var selCatat = document.getElementById('catatIdPelanggan');
       var selAduan = document.getElementById('aduanIdPelanggan');
-
       var optHtml = '<option value="">-- Pilih Pelanggan --</option>';
       for (var i = 0; i < rawPelangganList.length; i++) {
         var p = rawPelangganList[i];
         optHtml += '<option value="' + p.idPelanggan + '">' + p.idPelanggan + ' - ' + p.nama + ' (' + p.alamat + ')</option>';
       }
-
       if (selCatat) selCatat.innerHTML = optHtml;
       if (selAduan) selAduan.innerHTML = optHtml;
     }
@@ -2354,7 +2830,7 @@
       document.getElementById('formPelangganNoHp').value = item.noHp;
       document.getElementById('formPelangganAlamat').value = item.alamat;
       document.getElementById('formPelangganGolongan').value = item.golongan;
-      document.getElementById('formPelangganMeterAwal').value = item.meterAwal;
+      document.getElementById('formPelangganMeterAwal').value = (parseFloat(item.meterAwal) || 0).toLocaleString('id-ID');
       document.getElementById('formPelangganPassword').value = item.password || '';
       document.getElementById('modalFormPelanggan').classList.add('active');
     }
@@ -2368,7 +2844,7 @@
         noHp: document.getElementById('formPelangganNoHp').value.trim(),
         alamat: document.getElementById('formPelangganAlamat').value.trim(),
         golongan: document.getElementById('formPelangganGolongan').value,
-        meterAwal: document.getElementById('formPelangganMeterAwal').value,
+        meterAwal: parseRibuan(document.getElementById('formPelangganMeterAwal').value),
         password: document.getElementById('formPelangganPassword').value.trim()
       };
 
@@ -2412,12 +2888,10 @@
       window.open("https://api.whatsapp.com/send?phone=" + cleanHp + "&text=" + encodeURIComponent(pesan), "_blank");
     }
 
-    let rawPetugasList = [];
-
     function loadPetugasList() {
       var tbody = document.getElementById('tbodyPetugas');
       if (!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data petugas & akun...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data petugas...</td></tr>';
 
       callBackend("getPetugasList", [""], function(res) {
         if (res.success) {
@@ -2426,8 +2900,6 @@
         } else {
           tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--danger);">' + (res.message || "Gagal memuat petugas") + '</td></tr>';
         }
-      }, function(err) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--danger);">Koneksi server gagal!</td></tr>';
       });
     }
 
@@ -2435,15 +2907,13 @@
       var tbody = document.getElementById('tbodyPetugas');
       if (!tbody) return;
       if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada data petugas terdaftar.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada petugas terdaftar.</td></tr>';
         return;
       }
       var html = '';
       for (var i = 0; i < list.length; i++) {
         var it = list[i];
-        var badgeRole = 'badge-info';
-        if (it.role === 'Admin') badgeRole = 'badge-success';
-        if (it.role === 'Kasir') badgeRole = 'badge-warning';
+        var badgeRole = (it.role === 'Admin') ? 'badge-success' : ((it.role === 'Kasir') ? 'badge-warning' : 'badge-info');
         var badgeStatus = (it.status === 'Aktif') ? 'badge-success' : 'badge-danger';
 
         html += '<tr>' +
@@ -2547,32 +3017,35 @@
 
       callBackend("getPelangganMeterInfo", [idPel, periode], function(res) {
         if (res.success) {
-          document.getElementById('catatMeterLalu').value = res.data.meterLalu || 0;
+          document.getElementById('catatMeterLalu').value = (parseFloat(res.data.meterLalu) || 0).toLocaleString('id-ID');
           kalkulasiPemakaianMeter();
         }
       });
     }
 
     function kalkulasiPemakaianMeter() {
-      var lalu = parseFloat(document.getElementById('catatMeterLalu').value) || 0;
-      var kini = parseFloat(document.getElementById('catatMeterKini').value) || 0;
+      var lalu = parseRibuan(document.getElementById('catatMeterLalu').value);
+      var kini = parseRibuan(document.getElementById('catatMeterKini').value);
       var pakai = Math.max(0, kini - lalu);
-      document.getElementById('catatHitungPemakaian').innerText = pakai + " m³";
+      document.getElementById('catatHitungPemakaian').innerText = pakai.toLocaleString('id-ID') + " m³";
     }
 
     function submitCatatMeter() {
-      var payload = {
-        idPelanggan: document.getElementById('catatIdPelanggan').value,
-        periode: document.getElementById('catatPeriode').value.trim(),
-        meterLalu: document.getElementById('catatMeterLalu').value,
-        meterKini: document.getElementById('catatMeterKini').value,
-        petugas: currentUser ? currentUser.username : "operator"
-      };
+      var meterLaluNum = parseRibuan(document.getElementById('catatMeterLalu').value);
+      var meterKiniNum = parseRibuan(document.getElementById('catatMeterKini').value);
 
-      if (parseFloat(payload.meterKini) < parseFloat(payload.meterLalu)) {
+      if (meterKiniNum < meterLaluNum) {
         showToast("Angka meter kini tidak boleh lebih kecil dari meter lalu!", "warning");
         return;
       }
+
+      var payload = {
+        idPelanggan: document.getElementById('catatIdPelanggan').value,
+        periode: document.getElementById('catatPeriode').value.trim(),
+        meterLalu: meterLaluNum,
+        meterKini: meterKiniNum,
+        petugas: currentUser ? currentUser.username : "operator"
+      };
 
       callBackend("simpanCatatMeter", [payload], function(res) {
         if (res.success) {
@@ -2584,6 +3057,65 @@
           showToast(res.message, "error");
         }
       });
+    }
+
+    function bukaScanQrMeter() {
+      document.getElementById('modalScanQr').classList.add('active');
+      if (typeof Html5Qrcode !== 'undefined') {
+        if (!qrScannerInstance) {
+          qrScannerInstance = new Html5Qrcode("readerQrScan");
+        }
+        qrScannerInstance.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          function(decodedText) {
+            handleHasilScanQr(decodedText);
+          },
+          function() {}
+        ).catch(function(err) {
+          showToast("Akses kamera tidak tersedia: " + err, "warning");
+        });
+      } else {
+        showToast("Pustaka pemindai belum siap!", "warning");
+      }
+    }
+
+    function tutupScanQrMeter() {
+      if (qrScannerInstance) {
+        qrScannerInstance.stop().then(function() {
+          document.getElementById('modalScanQr').classList.remove('active');
+        }).catch(function() {
+          document.getElementById('modalScanQr').classList.remove('active');
+        });
+      } else {
+        document.getElementById('modalScanQr').classList.remove('active');
+      }
+    }
+
+    function handleHasilScanQr(kode) {
+      var cleanKode = kode.trim();
+      var targetId = cleanKode;
+      var match = cleanKode.match(/PLG-\d+/i);
+      if (match) targetId = match[0].toUpperCase();
+
+      var selectEl = document.getElementById('catatIdPelanggan');
+      var found = false;
+      for (var i = 0; i < selectEl.options.length; i++) {
+        if (selectEl.options[i].value.toUpperCase() === targetId) {
+          selectEl.selectedIndex = i;
+          found = true;
+          break;
+        }
+      }
+
+      tutupScanQrMeter();
+
+      if (found) {
+        showToast("Pelanggan " + targetId + " berhasil dipindai!", "success");
+        loadPelangganMeterInfo();
+      } else {
+        showToast("ID " + targetId + " tidak terdaftar!", "warning");
+      }
     }
 
     function loadAduanList() {
@@ -2604,21 +3136,93 @@
           for (var i = 0; i < list.length; i++) {
             var it = list[i];
             var stBadge = (it.status === 'Selesai') ? 'badge-success' : 'badge-warning';
+            var infoMaterial = (it.materialTerpakai && it.materialTerpakai !== '-')
+              ? '<div style="font-size: 11px; color: var(--warning); margin-top: 4px;"><i class="fa-solid fa-toolbox"></i> ' + it.materialTerpakai + '</div>'
+              : '';
+
             html += '<tr>' +
               '<td style="font-weight: 700; color: var(--primary); font-family: monospace;">' + it.idTiket + '</td>' +
               '<td>' + it.idPelanggan + '</td>' +
               '<td style="font-weight: 600;">' + it.namaPelanggan + '</td>' +
               '<td>' + it.tglLapor + '</td>' +
               '<td><span class="badge badge-info">' + it.kategori + '</span></td>' +
-              '<td>' + it.keterangan + '</td>' +
+              '<td><div>' + it.keterangan + '</div>' + infoMaterial + '</td>' +
               '<td><span class="badge ' + stBadge + '">' + it.status + '</span></td>' +
               '<td>' + (it.teknisi || '-') + '</td>' +
-              '<td style="text-align: center;">' +
+              '<td style="text-align: center; white-space: nowrap;">' +
+                '<button class="btn btn-secondary btn-sm" onclick="bukaModalPakaiMaterial(\'' + it.idTiket + '\')" title="Catat Material Digunakan" style="margin-right: 4px;"><i class="fa-solid fa-toolbox"></i> Material</button>' +
                 (it.status !== 'Selesai' ? '<button class="btn btn-success btn-sm" onclick="selesaikanTiketAction(\'' + it.idTiket + '\')"><i class="fa-solid fa-check"></i> Selesai</button>' : '-') +
               '</td>' +
             '</tr>';
           }
           tbody.innerHTML = html;
+        }
+      });
+    }
+
+    function bukaModalPakaiMaterial(idTiket) {
+      document.getElementById('aduanPakaiIdTiket').value = idTiket;
+      document.getElementById('aduanPakaiLabelTiket').value = idTiket;
+      document.getElementById('aduanPakaiQty').value = '1';
+      document.getElementById('aduanPakaiCatatan').value = '';
+      document.getElementById('aduanPakaiSisaStok').innerText = '-';
+
+      var selectEl = document.getElementById('aduanPakaiKodeBarang');
+      selectEl.innerHTML = '<option value="">-- Memuat material gudang... --</option>';
+
+      callBackend("getInventarisList", [], function(res) {
+        if (res.success && res.data && res.data.length > 0) {
+          var opts = '<option value="">-- Pilih Material dari Gudang --</option>';
+          for (var i = 0; i < res.data.length; i++) {
+            var m = res.data[i];
+            opts += '<option value="' + m.kodeBarang + '" data-stok="' + m.stok + '" data-satuan="' + m.satuan + '">' +
+              m.namaBarang + ' (' + m.kodeBarang + ') - Sisa: ' + m.stok + ' ' + m.satuan +
+            '</option>';
+          }
+          selectEl.innerHTML = opts;
+        } else {
+          selectEl.innerHTML = '<option value="">(Belum ada material di logistik)</option>';
+        }
+        document.getElementById('modalPakaiMaterialAduan').classList.add('active');
+      });
+    }
+
+    function updateInfoStokMaterialAduan() {
+      var selectEl = document.getElementById('aduanPakaiKodeBarang');
+      var opt = selectEl.options[selectEl.selectedIndex];
+      var lbl = document.getElementById('aduanPakaiSisaStok');
+      if (opt && opt.value) {
+        var stok = opt.getAttribute('data-stok') || '0';
+        var satuan = opt.getAttribute('data-satuan') || '';
+        lbl.innerText = (parseFloat(stok) || 0).toLocaleString('id-ID') + ' ' + satuan;
+      } else {
+        lbl.innerText = '-';
+      }
+    }
+
+    function submitMaterialAduan() {
+      var idTiket = document.getElementById('aduanPakaiIdTiket').value;
+      var kodeBarang = document.getElementById('aduanPakaiKodeBarang').value;
+      var qty = parseRibuan(document.getElementById('aduanPakaiQty').value);
+      var catatan = document.getElementById('aduanPakaiCatatan').value.trim();
+      var teknisi = currentUser ? currentUser.nama : "Teknisi";
+
+      if (!kodeBarang) {
+        showToast("Pilih material terlebih dahulu!", "warning");
+        return;
+      }
+      if (qty <= 0) {
+        showToast("Jumlah pemakaian harus lebih dari 0!", "warning");
+        return;
+      }
+
+      callBackend("catatMaterialTiket", [idTiket, kodeBarang, qty, teknisi, catatan], function(res) {
+        if (res.success) {
+          showToast(res.message, "success");
+          closeModal('modalPakaiMaterialAduan');
+          loadAduanList();
+        } else {
+          showToast(res.message, "error");
         }
       });
     }
@@ -2673,9 +3277,7 @@
           var html = '';
           for (var i = 0; i < list.length; i++) {
             var it = list[i];
-            var stClass = 'badge-warning';
-            if (it.status === 'Selesai Dipasang') stClass = 'badge-success';
-            if (it.status === 'Ditolak') stClass = 'badge-danger';
+            var stClass = (it.status === 'Selesai Dipasang') ? 'badge-success' : ((it.status === 'Ditolak') ? 'badge-danger' : 'badge-warning');
             html += '<tr>' +
               '<td style="font-weight: 700; color: var(--primary);">' + it.idPasang + '</td>' +
               '<td style="font-weight: 600;">' + it.nama + '</td>' +
@@ -2693,6 +3295,67 @@
       });
     }
 
+    function openModalPasangBaru() {
+      document.getElementById('psbNama').value = '';
+      document.getElementById('psbNik').value = '';
+      document.getElementById('psbNoHp').value = '';
+      document.getElementById('psbAlamat').value = '';
+      document.getElementById('psbRtRw').value = '';
+      document.getElementById('psbGolongan').value = 'R-1';
+      document.getElementById('psbCatatan').value = '';
+      document.getElementById('modalFormPasangBaru').classList.add('active');
+    }
+
+    function submitFormPasangBaru() {
+      var payload = {
+        nama: document.getElementById('psbNama').value.trim(),
+        nik: document.getElementById('psbNik').value.trim(),
+        noHp: document.getElementById('psbNoHp').value.trim(),
+        alamat: document.getElementById('psbAlamat').value.trim(),
+        rtRw: document.getElementById('psbRtRw').value.trim(),
+        golongan: document.getElementById('psbGolongan').value,
+        catatan: document.getElementById('psbCatatan').value.trim()
+      };
+
+      callBackend("submitPendaftaranPasangBaru", [payload], function(res) {
+        if (res.success) {
+          showToast(res.message, "success");
+          closeModal('modalFormPasangBaru');
+          loadPasangBaruList();
+        } else {
+          showToast(res.message, "error");
+        }
+      });
+    }
+
+    function openModalTransaksiKas() {
+      document.getElementById('kasNominal').value = '';
+      document.getElementById('kasKategori').value = '';
+      document.getElementById('kasKeterangan').value = '';
+      document.getElementById('modalFormKas').classList.add('active');
+    }
+
+    function submitFormKas() {
+      var payload = {
+        jenis: document.getElementById('kasJenis').value,
+        kategori: document.getElementById('kasKategori').value.trim(),
+        keterangan: document.getElementById('kasKeterangan').value.trim(),
+        nominal: parseRibuan(document.getElementById('kasNominal').value),
+        petugas: currentUser ? currentUser.nama : "admin"
+      };
+
+      callBackend("simpanTransaksiKas", [payload], function(res) {
+        if (res.success) {
+          showToast(res.message, "success");
+          closeModal('modalFormKas');
+          loadBukuKasList();
+          loadDashboardMetrics();
+        } else {
+          showToast(res.message, "error");
+        }
+      });
+    }
+
     function loadBukuKasList() {
       var tbody = document.getElementById('tbodyBukuKas');
       if (!tbody) return;
@@ -2701,7 +3364,7 @@
         if (res.success) {
           var list = res.data;
           if (!list || list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada transaksi kas tercatat.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada transaksi kas.</td></tr>';
             return;
           }
           var html = '';
@@ -2724,6 +3387,35 @@
       });
     }
 
+    function openModalTambahMaterial() {
+      document.getElementById('matNama').value = '';
+      document.getElementById('matSatuan').value = 'Unit';
+      document.getElementById('matStok').value = '1';
+      document.getElementById('matHarga').value = '0';
+      document.getElementById('matKeterangan').value = '';
+      document.getElementById('modalFormMaterial').classList.add('active');
+    }
+
+    function submitFormMaterial() {
+      var payload = {
+        namaBarang: document.getElementById('matNama').value.trim(),
+        satuan: document.getElementById('matSatuan').value.trim(),
+        stok: parseRibuan(document.getElementById('matStok').value),
+        hargaSatuan: parseRibuan(document.getElementById('matHarga').value),
+        keterangan: document.getElementById('matKeterangan').value.trim()
+      };
+
+      callBackend("simpanMaterialBaru", [payload], function(res) {
+        if (res.success) {
+          showToast(res.message, "success");
+          closeModal('modalFormMaterial');
+          loadInventarisList();
+        } else {
+          showToast(res.message, "error");
+        }
+      });
+    }
+
     function loadInventarisList() {
       var tbody = document.getElementById('tbodyInventaris');
       if (!tbody) return;
@@ -2742,10 +3434,10 @@
               '<td style="font-weight: 700; color: var(--primary);">' + m.kodeBarang + '</td>' +
               '<td style="font-weight: 600;">' + m.namaBarang + '</td>' +
               '<td>' + m.satuan + '</td>' +
-              '<td style="font-weight: 700;">' + m.stok + '</td>' +
+              '<td style="font-weight: 700;">' + (parseFloat(m.stok) || 0).toLocaleString('id-ID') + '</td>' +
               '<td>' + formatRupiah(m.hargaSatuan) + '</td>' +
               '<td>' + m.keterangan + '</td>' +
-              '<td style="text-align: center;"><button class="btn btn-secondary btn-sm" onclick="showToast(\'Stok ' + m.namaBarang + ': ' + m.stok + ' ' + m.satuan + '\', \'info\')"><i class="fa-solid fa-box"></i> Cek</button></td>' +
+              '<td style="text-align: center;"><button class="btn btn-secondary btn-sm" onclick="showToast(\'Stok: ' + (parseFloat(m.stok) || 0).toLocaleString('id-ID') + ' ' + m.satuan + '\', \'info\')"><i class="fa-solid fa-box"></i> Cek</button></td>' +
             '</tr>';
           }
           tbody.innerHTML = html;
@@ -2753,31 +3445,102 @@
       });
     }
 
+    function openModalCatatNrw() {
+      document.getElementById('titleModalNrw').innerHTML = '<i class="fa-solid fa-droplet-slash" style="color: var(--primary);"></i> Catat Meter Induk Tandon (NRW)';
+      document.getElementById('nrwIsEdit').value = '0';
+      document.getElementById('nrwIdNrw').value = '';
+      var now = new Date();
+      var mm = ('0' + (now.getMonth() + 1)).slice(-2);
+      var yyyy = now.getFullYear();
+      document.getElementById('nrwPeriode').value = mm + '/' + yyyy;
+      document.getElementById('nrwMeterAwal').value = '';
+      document.getElementById('nrwMeterAkhir').value = '';
+      document.getElementById('modalFormNrw').classList.add('active');
+    }
+
+    function editNrw(idNrw) {
+      var item = rawNrwList.find(function(n) { return n.idNrw === idNrw; });
+      if (!item) return;
+
+      document.getElementById('titleModalNrw').innerHTML = '<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> Edit Data NRW (' + item.idNrw + ')';
+      document.getElementById('nrwIsEdit').value = '1';
+      document.getElementById('nrwIdNrw').value = item.idNrw;
+      document.getElementById('nrwPeriode').value = item.periode;
+      document.getElementById('nrwMeterAwal').value = (parseFloat(item.meterAwal) || 0).toLocaleString('id-ID');
+      document.getElementById('nrwMeterAkhir').value = (parseFloat(item.meterAkhir) || 0).toLocaleString('id-ID');
+      document.getElementById('modalFormNrw').classList.add('active');
+    }
+
+    function hapusNrwAction(idNrw) {
+      callBackend("hapusCatatMeterIndukNRW", [idNrw], function(res) {
+        if (res.success) {
+          showToast(res.message, "success");
+          loadNrwList();
+        } else {
+          showToast(res.message, "error");
+        }
+      });
+    }
+
+    function submitFormNrw() {
+      var meterAwalNum = parseRibuan(document.getElementById('nrwMeterAwal').value);
+      var meterAkhirNum = parseRibuan(document.getElementById('nrwMeterAkhir').value);
+
+      if (meterAkhirNum < meterAwalNum) {
+        showToast("Meter akhir tidak boleh lebih kecil dari meter awal!", "warning");
+        return;
+      }
+
+      var isEdit = document.getElementById('nrwIsEdit').value === '1';
+      var payload = {
+        idNrw: document.getElementById('nrwIdNrw').value,
+        periode: document.getElementById('nrwPeriode').value.trim(),
+        meterAwal: meterAwalNum,
+        meterAkhir: meterAkhirNum,
+        petugas: currentUser ? currentUser.nama : "operator"
+      };
+
+      var action = isEdit ? "updateCatatMeterIndukNRW" : "simpanCatatMeterIndukNRW";
+      callBackend(action, [payload], function(res) {
+        if (res.success) {
+          showToast(res.message, "success");
+          closeModal('modalFormNrw');
+          loadNrwList();
+        } else {
+          showToast(res.message, "error");
+        }
+      });
+    }
+
     function loadNrwList() {
       var tbody = document.getElementById('tbodyNrw');
       if (!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data NRW...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data NRW...</td></tr>';
       callBackend("getNRWList", [], function(res) {
         if (res.success) {
-          var list = res.data;
-          if (!list || list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada data NRW tandon.</td></tr>';
+          rawNrwList = res.data || [];
+          if (rawNrwList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada data NRW tandon.</td></tr>';
             return;
           }
           var html = '';
-          for (var i = 0; i < list.length; i++) {
-            var n = list[i];
+          for (var i = 0; i < rawNrwList.length; i++) {
+            var n = rawNrwList[i];
             var badgeStatus = n.status === 'Normal' ? 'badge-success' : 'badge-danger';
             html += '<tr>' +
-              '<td style="font-weight: 700; color: var(--primary);">' + n.idNrw + '</td>' +
+              '<td style="font-weight: 700; color: var(--primary); font-family: monospace;">' + n.idNrw + '</td>' +
               '<td>' + formatNamaPeriode(n.periode) + '</td>' +
               '<td>' + n.tglCatat + '</td>' +
-              '<td>' + n.airTandon + ' m³</td>' +
-              '<td>' + n.airWarga + ' m³</td>' +
-              '<td style="font-weight: 700;">' + n.lossesM3 + ' m³</td>' +
+              '<td>' + (parseFloat(n.airTandon) || 0).toLocaleString('id-ID') + ' m³</td>' +
+              '<td>' + (parseFloat(n.airWarga) || 0).toLocaleString('id-ID') + ' m³</td>' +
+              '<td style="font-weight: 700;">' + (parseFloat(n.lossesM3) || 0).toLocaleString('id-ID') + ' m³</td>' +
               '<td style="font-weight: 700; color: var(--warning);">' + n.persenLoss + '</td>' +
               '<td><span class="badge ' + badgeStatus + '">' + n.status + '</span></td>' +
               '<td>' + n.petugas + '</td>' +
+              '<td style="text-align: center; white-space: nowrap;">' +
+                '<button class="btn btn-secondary btn-sm" onclick="editNrw(\'' + n.idNrw + '\')" title="Edit NRW" style="margin-right: 4px;"><i class="fa-solid fa-pen-to-square"></i></button>' +
+                '<button class="btn btn-danger btn-sm" onclick="hapusNrwAction(\'' + n.idNrw + '\')" title="Hapus NRW"><i class="fa-solid fa-trash"></i></button>' +
+              '</td>' +
             '</tr>';
           }
           tbody.innerHTML = html;
@@ -2787,33 +3550,131 @@
 
     function loadPengaturanSistem() {
       callBackend("getTarifSettings", [], function(res) {
-        if (res.success && res.appSettings) {
-          var s = res.appSettings;
-          if (s.nama_instansi) document.getElementById('setNamaInstansi').value = s.nama_instansi;
-          if (s.sub_judul_instansi) document.getElementById('setSubInstansi').value = s.sub_judul_instansi;
-          if (s.alamat_instansi) document.getElementById('setAlamatInstansi').value = s.alamat_instansi;
-          if (s.tgl_jatuh_tempo) document.getElementById('setTglTempo').value = s.tgl_jatuh_tempo;
-          if (s.nominal_denda) document.getElementById('setNominalDenda').value = s.nominal_denda;
-          if (s.biaya_admin) document.getElementById('setBiayaAdmin').value = s.biaya_admin;
-          if (s.nomor_wa_callcenter) document.getElementById('setNoWaCallCenter').value = s.nomor_wa_callcenter;
+        if (res.success) {
+          if (res.appSettings) {
+            cachedAppSettings = res.appSettings;
+            var s = res.appSettings;
+            if (s.nama_instansi) document.getElementById('setNamaInstansi').value = s.nama_instansi;
+            if (s.sub_judul_instansi) document.getElementById('setSubInstansi').value = s.sub_judul_instansi;
+            if (s.alamat_instansi) document.getElementById('setAlamatInstansi').value = s.alamat_instansi;
+            if (s.tgl_jatuh_tempo) document.getElementById('setTglTempo').value = s.tgl_jatuh_tempo;
+            if (s.nominal_denda) document.getElementById('setNominalDenda').value = (parseFloat(s.nominal_denda) || 0).toLocaleString('id-ID');
+            if (s.biaya_admin) document.getElementById('setBiayaAdmin').value = (parseFloat(s.biaya_admin) || 0).toLocaleString('id-ID');
+            if (s.nomor_wa_callcenter) document.getElementById('setNoWaCallCenter').value = s.nomor_wa_callcenter;
+            if (typeof s.aktif_transfer !== 'undefined') document.getElementById('setAktifTransfer').checked = (s.aktif_transfer !== 'Tidak');
+            if (s.info_rekening) {
+              document.getElementById('setInfoRekening').value = s.info_rekening;
+              var tfInfoEl = document.getElementById('kasirTeksRekeningBank');
+              if (tfInfoEl) tfInfoEl.innerText = s.info_rekening;
+            }
+            if (typeof s.aktif_qris !== 'undefined') document.getElementById('setAktifQris').checked = (s.aktif_qris !== 'Tidak');
+            if (s.info_qris) {
+              document.getElementById('setInfoQris').value = s.info_qris;
+              var qrisInfoEl = document.getElementById('kasirTeksNmidQris');
+              if (qrisInfoEl) qrisInfoEl.innerText = s.info_qris;
+            }
+            if (s.gambar_qris && s.gambar_qris.trim() !== "") {
+              document.getElementById('setGambarQris').value = s.gambar_qris;
+              var prevImg = document.getElementById('previewGambarQris');
+              var wrapPrev = document.getElementById('wrapPreviewQris');
+              if (prevImg && wrapPrev) {
+                prevImg.src = s.gambar_qris;
+                wrapPrev.style.display = 'block';
+              }
+            }
+          }
+
+          if (res.data && res.data.length > 0) {
+            for (var i = 0; i < res.data.length; i++) {
+              var trf = res.data[i];
+              var kodeClean = trf.kodeGolongan.replace('-', '');
+              var bebanEl = document.getElementById('trf_beban_' + kodeClean);
+              var m3El = document.getElementById('trf_perm3_' + kodeClean);
+              var psbEl = document.getElementById('trf_psb_' + kodeClean);
+              if (bebanEl) bebanEl.value = (parseFloat(trf.biayaBeban) || 0).toLocaleString('id-ID');
+              if (m3El) m3El.value = (parseFloat(trf.tarifPerM3) || 0).toLocaleString('id-ID');
+              if (psbEl) psbEl.value = (parseFloat(trf.biayaPasangBaru) || 0).toLocaleString('id-ID');
+            }
+          }
         }
       });
     }
 
+    function handleUploadGambarQris(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        showToast("Ukuran file gambar maksimal 2 MB!", "warning");
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64 = e.target.result;
+        document.getElementById('setGambarQris').value = base64;
+        var prevImg = document.getElementById('previewGambarQris');
+        var wrapPrev = document.getElementById('wrapPreviewQris');
+        if (prevImg && wrapPrev) {
+          prevImg.src = base64;
+          wrapPrev.style.display = 'block';
+        }
+        showToast("Gambar QRIS berhasil dimuat!", "success");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function hapusGambarQris() {
+      document.getElementById('setGambarQris').value = "";
+      document.getElementById('inputUploadGambarQris').value = "";
+      var wrapPrev = document.getElementById('wrapPreviewQris');
+      if (wrapPrev) wrapPrev.style.display = "none";
+      showToast("Gambar QRIS dihapus.", "info");
+    }
+
     function simpanPengaturanSistem() {
+      var dendaNum = parseRibuan(document.getElementById('setNominalDenda').value);
+      var adminNum = parseRibuan(document.getElementById('setBiayaAdmin').value);
+
       var appSettings = {
         nama_instansi: document.getElementById('setNamaInstansi').value.trim(),
         sub_judul_instansi: document.getElementById('setSubInstansi').value.trim(),
         alamat_instansi: document.getElementById('setAlamatInstansi').value.trim(),
         tgl_jatuh_tempo: document.getElementById('setTglTempo').value.trim(),
-        nominal_denda: document.getElementById('setNominalDenda').value.trim(),
-        biaya_admin: document.getElementById('setBiayaAdmin').value.trim(),
-        nomor_wa_callcenter: document.getElementById('setNoWaCallCenter').value.trim()
+        nominal_denda: dendaNum,
+        biaya_admin: adminNum,
+        nomor_wa_callcenter: document.getElementById('setNoWaCallCenter').value.trim(),
+        aktif_transfer: document.getElementById('setAktifTransfer').checked ? "Ya" : "Tidak",
+        info_rekening: document.getElementById('setInfoRekening').value.trim(),
+        aktif_qris: document.getElementById('setAktifQris').checked ? "Ya" : "Tidak",
+        info_qris: document.getElementById('setInfoQris').value.trim(),
+        gambar_qris: document.getElementById('setGambarQris') ? document.getElementById('setGambarQris').value : ""
       };
 
-      callBackend("updateTarifSettings", [[], appSettings], function(res) {
+      cachedAppSettings = appSettings;
+
+      var tarifArray = [
+        {
+          kodeGolongan: "R-1",
+          biayaBeban: parseRibuan(document.getElementById('trf_beban_R1').value),
+          tarifPerM3: parseRibuan(document.getElementById('trf_perm3_R1').value),
+          biayaPasangBaru: parseRibuan(document.getElementById('trf_psb_R1').value)
+        },
+        {
+          kodeGolongan: "N-1",
+          biayaBeban: parseRibuan(document.getElementById('trf_beban_N1').value),
+          tarifPerM3: parseRibuan(document.getElementById('trf_perm3_N1').value),
+          biayaPasangBaru: parseRibuan(document.getElementById('trf_psb_N1').value)
+        },
+        {
+          kodeGolongan: "S-1",
+          biayaBeban: parseRibuan(document.getElementById('trf_beban_S1').value),
+          tarifPerM3: parseRibuan(document.getElementById('trf_perm3_S1').value),
+          biayaPasangBaru: parseRibuan(document.getElementById('trf_psb_S1').value)
+        }
+      ];
+
+      callBackend("updateTarifSettings", [tarifArray, appSettings], function(res) {
         if (res.success) {
-          showToast("Konfigurasi sistem berhasil disimpan!", "success");
+          showToast("Konfigurasi sistem & tarif berhasil disimpan!", "success");
           document.getElementById('navNamaInstansi').innerText = appSettings.nama_instansi;
           document.getElementById('navSubInstansi').innerText = appSettings.sub_judul_instansi;
         } else {
@@ -2823,72 +3684,56 @@
     }
 
     function kirimSiaranWaWarga() {
-      if (!rawPelangganList || rawPelangganList.length === 0) {
-        showToast("Memuat data pelanggan terlebih dahulu...", "info");
-        callBackend("getPelangganList", [""], function(res) {
-          if (res.success) {
-            rawPelangganList = res.data;
-            bukaWindowSiaranWa();
-          }
-        });
-      } else {
-        bukaWindowSiaranWa();
-      }
-    }
-
-    function bukaWindowSiaranWa() {
-      var pesan = "*PENGUMUMAN PAMSIMAS*\n\n" +
-        "Yth. Seluruh Warga Pelanggan Air Bersih,\n" +
-        "Diberitahukan bahwa pencatatan meteran periode bulan ini telah selesai. " +
-        "Mohon melakukan pengecekan rekening tagihan air Anda melalui portal resmi PAMSIMAS sebelum tanggal jatuh tempo.\n\n" +
-        "Terima kasih atas kerja samanya.";
+      var pesan = "*PEMBERITAHUAN TAGIHAN AIR PAMSIMAS*\n\n" +
+        "Diberitahukan kepada seluruh warga pelanggan PAMSIMAS, mohon untuk segera melakukan pembayaran rekening air sebelum batas tanggal jatuh tempo.\n\n" +
+        "Pembayaran dapat dilakukan melalui loket kantor atau transfer bank.\nTerima kasih atas kerja samanya.";
       window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(pesan), "_blank");
     }
 
-    let btDevice = null;
-    let btCharacteristic = null;
-
     function openModalBluetoothPrinter() {
-      var width = localStorage.getItem('bt_paper_width') || '58mm';
-      document.getElementById('selectBtPaperWidth').value = width;
       updateStatusBluetoothUI();
+      var sel = document.getElementById('selectBtPaperWidth');
+      if (sel) {
+        sel.value = localStorage.getItem('bt_paper_width') || '58mm';
+      }
       document.getElementById('modalBluetoothPrinter').classList.add('active');
     }
 
     function simpanPengaturanLebarKertas() {
-      var width = document.getElementById('selectBtPaperWidth').value;
-      localStorage.setItem('bt_paper_width', width);
-      showToast("Ukuran kertas thermal diatur ke " + width, "info");
+      var sel = document.getElementById('selectBtPaperWidth');
+      if (sel) {
+        localStorage.setItem('bt_paper_width', sel.value);
+        showToast("Lebar kertas disetel ke: " + sel.value, "info");
+      }
     }
 
     function updateStatusBluetoothUI() {
       var lblStatus = document.getElementById('labelStatusBtPrinter');
       var lblNama = document.getElementById('labelNamaBtPrinter');
-      if (btCharacteristic) {
-        lblStatus.innerText = "Terhubung (Siap Cetak)";
-        lblStatus.style.color = "var(--primary)";
-        lblNama.innerText = (btDevice ? btDevice.name : "Printer Thermal");
+      if (btDevice && btDevice.gatt && btDevice.gatt.connected) {
+        if (lblStatus) { lblStatus.innerText = "Terhubung"; lblStatus.style.color = "var(--primary)"; }
+        if (lblNama) { lblNama.innerText = btDevice.name || "Printer Thermal"; lblNama.style.color = "var(--text-main)"; }
       } else {
-        lblStatus.innerText = "Belum Terhubung";
-        lblStatus.style.color = "var(--danger)";
-        lblNama.innerText = "-";
+        if (lblStatus) { lblStatus.innerText = "Belum Terhubung"; lblStatus.style.color = "var(--danger)"; }
+        if (lblNama) { lblNama.innerText = "-"; lblNama.style.color = "var(--text-muted)"; }
       }
     }
 
-    function scanBluetoothPrinter() {
+    function scanBluetoothPrinter(onConnectedCallback) {
       if (!navigator.bluetooth) {
-        showToast("Browser ini belum mendukung Web Bluetooth. Beralih ke dialog cetak browser.", "warning");
+        showToast("Browser tidak mendukung Web Bluetooth langsung. Mengalihkan ke cetak sistem...", "info");
         fallbackCetakThermalSpooler();
         return;
       }
 
-      showToast("Mencari perangkat printer Bluetooth...", "info");
+      showToast("Mencari printer Bluetooth...", "info");
       navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
         optionalServices: [
           '000018f0-0000-1000-8000-00805f9b34fb',
           '49535343-fe7d-4ae5-8fa9-9fafd205e455',
-          'e7810a71-73ae-499d-8c15-faa9aef0c3f2'
+          'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
+          '0000ffe0-0000-1000-8000-00805f9b34fb'
         ]
       })
       .then(function(device) {
@@ -2899,7 +3744,7 @@
         return server.getPrimaryServices();
       })
       .then(function(services) {
-        if (services.length === 0) throw new Error("Layanan cetak thermal tidak ditemukan.");
+        if (!services || services.length === 0) throw new Error("Layanan cetak tidak ditemukan.");
         return services[0].getCharacteristics();
       })
       .then(function(characteristics) {
@@ -2911,11 +3756,13 @@
         }
         if (!btCharacteristic) throw new Error("Karakteristik write printer tidak ditemukan.");
         updateStatusBluetoothUI();
-        showToast("Printer " + btDevice.name + " berhasil tersambung!", "success");
+        showToast("Printer terhubung!", "success");
+        if (typeof onConnectedCallback === 'function') onConnectedCallback();
       })
       .catch(function(err) {
-        console.warn("Bluetooth Policy / User Cancel:", err);
-        showToast("Akses Bluetooth tidak aktif. Gunakan tombol 'Cetak Browser'.", "warning");
+        console.warn("Bluetooth info/fallback:", err);
+        showToast("Dialihkan ke pencetakan sistem...", "info");
+        fallbackCetakThermalSpooler();
       });
     }
 
@@ -2926,26 +3773,32 @@
       btDevice = null;
       btCharacteristic = null;
       updateStatusBluetoothUI();
-      showToast("Koneksi printer Bluetooth diputuskan.", "info");
+      showToast("Koneksi printer diputuskan.", "info");
     }
 
     function kirimCetakThermalBluetooth() {
-      if (!btCharacteristic) {
-        scanBluetoothPrinter();
+      if (!activeStrukData) {
+        showToast("Buka data struk tagihan terlebih dahulu!", "warning");
         return;
       }
-      if (!activeStrukData) return;
+      if (!btCharacteristic) {
+        scanBluetoothPrinter(function() {
+          kirimCetakThermalBluetooth();
+        });
+        return;
+      }
 
       var escData = buildEscPosData(activeStrukData);
       sendChunkedBluetoothData(escData, function() {
-        showToast("Struk kuitansi berhasil dicetak via Bluetooth!", "success");
+        showToast("Struk berhasil dicetak via Bluetooth!", "success");
       });
     }
 
     function testPrintThermal() {
       if (!btCharacteristic) {
-        showToast("Silakan hubungkan printer Bluetooth terlebih dahulu!", "warning");
-        scanBluetoothPrinter();
+        scanBluetoothPrinter(function() {
+          testPrintThermal();
+        });
         return;
       }
       var testData = buildEscPosTestData();
@@ -2955,7 +3808,52 @@
     }
 
     function fallbackCetakThermalSpooler() {
-      window.print();
+      var box = document.getElementById('boxStrukKuitansi');
+      if (!box) {
+        window.print();
+        return;
+      }
+
+      var printFrame = document.getElementById('thermalPrintIframe');
+      if (!printFrame) {
+        printFrame = document.createElement('iframe');
+        printFrame.id = 'thermalPrintIframe';
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = 'none';
+        document.body.appendChild(printFrame);
+      }
+
+      var doc = printFrame.contentWindow.document;
+      doc.open();
+      doc.write('<!DOCTYPE html><html><head><title>Kuitansi Tagihan Air PAMSIMAS</title>');
+      doc.write('<style>');
+      doc.write('@page { size: 58mm auto; margin: 0; }');
+      doc.write('body { font-family: monospace; font-size: 11px; margin: 0; padding: 4mm; color: #000; background: #fff; line-height: 1.35; width: 48mm; }');
+      doc.write('.receipt-header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 8px; }');
+      doc.write('.receipt-header-title { font-size: 13px; font-weight: bold; }');
+      doc.write('.receipt-header-sub { font-size: 9.5px; }');
+      doc.write('.receipt-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 10.5px; }');
+      doc.write('.receipt-row.bold { font-weight: bold; }');
+      doc.write('.receipt-divider { border-top: 1px dashed #000; margin: 6px 0; }');
+      doc.write('.receipt-total-row { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: bold; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 5px 0; margin: 6px 0; }');
+      doc.write('.receipt-badge-status { text-align: center; padding: 5px; font-weight: bold; font-size: 11px; border: 1px solid #000; margin-top: 8px; }');
+      doc.write('</style></head><body>');
+      doc.write(box.innerHTML);
+      doc.write('</body></html>');
+      doc.close();
+
+      setTimeout(function() {
+        try {
+          printFrame.contentWindow.focus();
+          printFrame.contentWindow.print();
+        } catch(e) {
+          window.print();
+        }
+      }, 350);
     }
 
     function sendChunkedBluetoothData(uint8Array, callback) {
@@ -2972,7 +3870,7 @@
           offset += chunkSize;
           setTimeout(sendNext, 25);
         }).catch(function(err) {
-          showToast("Gagal mengirim data ke printer: " + err.message, "error");
+          showToast("Gagal mencetak: " + err.message, "error");
         });
       }
 
@@ -2990,10 +3888,7 @@
         for (var i = 0; i < str.length; i++) buffer.push(str.charCodeAt(i));
       }
 
-      // Initialize
       buffer.push(0x1B, 0x40);
-
-      // Center
       buffer.push(0x1B, 0x61, 0x01);
       buffer.push(0x1B, 0x45, 0x01);
       addStr("PAMSIMAS SAUYUNAN\n");
@@ -3002,7 +3897,6 @@
       addStr("Dusun Ciakar RW 02, Desa Cilmarias\n");
       addStr(lineSep);
 
-      // Left
       buffer.push(0x1B, 0x61, 0x00);
       addStr("Tanggal : " + getCurrentDateTimeString() + "\n");
       addStr("No.Tag  : " + it.idTagihan + "\n");
@@ -3010,7 +3904,7 @@
       addStr("Warga   : " + it.namaPelanggan + "\n");
       addStr("Periode : " + formatNamaPeriode(it.periode) + "\n");
       addStr(lineSep);
-      addStr("Stand Mtr: " + it.meterLalu + " -> " + it.meterKini + " (" + it.pemakaianM3 + " m3)\n");
+      addStr("Stand Mtr: " + (parseFloat(it.meterLalu) || 0).toLocaleString('id-ID') + " -> " + (parseFloat(it.meterKini) || 0).toLocaleString('id-ID') + " (" + (parseFloat(it.pemakaianM3) || 0).toLocaleString('id-ID') + " m3)\n");
       addStr("Biaya Air: " + formatRupiah(it.biayaAir) + "\n");
       addStr("Beban    : " + formatRupiah(it.biayaBeban) + "\n");
       addStr("Admin    : " + formatRupiah(3000) + "\n");
@@ -3042,9 +3936,6 @@
       return new Uint8Array(buffer);
     }
 
-    /* PWA INSTALL CONTROLLER */
-    let deferredPrompt = null;
-
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       deferredPrompt = e;
@@ -3058,13 +3949,13 @@
 
     function triggerPwaInstall() {
       if (!deferredPrompt) {
-        showToast("Untuk memasang, buka opsi browser -> 'Tambahkan ke Layar Utama'", "info");
+        showToast("Gunakan opsi browser: 'Tambahkan ke Layar Utama'", "info");
         return;
       }
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(function(res) {
         if (res.outcome === 'accepted') {
-          showToast("Aplikasi PAMSIMAS terpasang di HP!", "success");
+          showToast("Aplikasi PAMSIMAS terpasang!", "success");
         }
         deferredPrompt = null;
         dismissPwaBanner();
@@ -3074,31 +3965,6 @@
     function dismissPwaBanner() {
       document.getElementById('pwaInstallBanner').style.display = 'none';
       sessionStorage.setItem('pwa_dismissed', '1');
-    }
-
-    /* HELPER UTILITIES */
-    function formatRupiah(num) {
-      return "Rp " + (parseFloat(num) || 0).toLocaleString("id-ID");
-    }
-
-    function formatNamaPeriode(periodeStr) {
-      if (!periodeStr || periodeStr.indexOf('/') === -1) return periodeStr || "-";
-      var parts = periodeStr.split('/');
-      var mm = parseInt(parts[0], 10);
-      var yyyy = parts[1];
-      var bulanNama = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      return (bulanNama[mm] || mm) + "/ " + yyyy;
-    }
-
-    function getCurrentDateTimeString() {
-      var d = new Date();
-      var dd = ('0' + d.getDate()).slice(-2);
-      var mm = ('0' + (d.getMonth() + 1)).slice(-2);
-      var yyyy = d.getFullYear();
-      var hh = ('0' + d.getHours()).slice(-2);
-      var min = ('0' + d.getMinutes()).slice(-2);
-      var ss = ('0' + d.getSeconds()).slice(-2);
-      return dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + min + ':' + ss;
     }
 
     function closeModal(modalId) {
@@ -3112,7 +3978,6 @@
       setTimeout(function() { toast.classList.remove('show'); }, 3500);
     }
 
-    /* INITIALIZATION ON STARTUP */
     window.onload = function() {
       var storedUser = sessionStorage.getItem('pamsimas_user');
       if (storedUser) {
